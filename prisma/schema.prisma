@@ -1,0 +1,418 @@
+// JPC Portal — Prisma schema
+// Review gate: this schema must be approved by the user before `prisma migrate dev` is run.
+// Conventions:
+//   - Integer PKs (serial4) via `Int @id @default(autoincrement())` — see DECISIONS.md for why not BigInt.
+//   - `createdAt` / `updatedAt` on every domain table.
+//   - Soft delete (`deletedAt`) on User, Season, StudentProfile.
+//   - Audit columns (`createdById` / `updatedById`) on Season, Assignment, Submission.
+//   - `publicId` (nanoid, 10 chars) only on Submission per the per-entity URL strategy.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum UserRole {
+  SUPER
+  ADMIN
+  LEADER
+  STUDENT
+  MENTOR
+}
+
+enum SeasonStatus {
+  DRAFT
+  ACTIVE
+  COMPLETED
+  ARCHIVED
+}
+
+enum EnrollmentStatus {
+  ACTIVE
+  COMPLETED
+  WITHDRAWN
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  EXCUSED
+  LATE
+}
+
+enum SubmissionStatus {
+  DRAFT
+  SUBMITTED
+  REVIEWED
+  RETURNED
+}
+
+enum NoteVisibility {
+  LEADERS
+  MENTORS
+  ADMINS
+}
+
+// ---------------------------------------------------------------------------
+// Identity & auth
+// ---------------------------------------------------------------------------
+
+model User {
+  id            Int       @id @default(autoincrement())
+  email         String    @unique
+  name          String
+  passwordHash  String?
+  role          UserRole
+  avatarPath    String?
+  lastLoginAt   DateTime?
+  deletedAt     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  studentProfile StudentProfile?
+
+  seasonAdminAssignments     SeasonAdmin[] @relation("SeasonAdminUser")
+  seasonAdminAssignmentsMade SeasonAdmin[] @relation("SeasonAdminAssignedBy")
+  groupLeaderAssignments     GroupLeader[]
+  groupStudentMembership     GroupStudent?
+
+  invitesReceived     InviteToken[]        @relation("InviteUser")
+  invitesIssued       InviteToken[]        @relation("InviteIssuedBy")
+  passwordResetTokens PasswordResetToken[]
+
+  seasonsCreated          Season[]         @relation("SeasonCreatedBy")
+  seasonsUpdated          Season[]         @relation("SeasonUpdatedBy")
+  assignmentsCreated      Assignment[]     @relation("AssignmentCreatedBy")
+  assignmentsUpdated      Assignment[]     @relation("AssignmentUpdatedBy")
+  submissionsReviewed     Submission[]     @relation("SubmissionReviewedBy")
+  attendanceMarked        Attendance[]     @relation("AttendanceMarkedBy")
+  engagementNotesAuthored EngagementNote[] @relation("EngagementNoteAuthor")
+
+  attendanceRecords  Attendance[]       @relation("AttendanceStudent")
+  submissionsAsStudent Submission[]     @relation("SubmissionStudent")
+  seasonEnrollments  SeasonEnrollment[] @relation("EnrollmentStudent")
+  engagementNotesAbout EngagementNote[] @relation("EngagementNoteStudent")
+
+  @@index([role])
+  @@index([deletedAt])
+}
+
+model InviteToken {
+  id          Int       @id @default(autoincrement())
+  token       String    @unique
+  userId      Int
+  user        User      @relation("InviteUser", fields: [userId], references: [id], onDelete: Cascade)
+  invitedById Int
+  invitedBy   User      @relation("InviteIssuedBy", fields: [invitedById], references: [id], onDelete: Restrict)
+  expiresAt   DateTime
+  usedAt      DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model PasswordResetToken {
+  id        Int       @id @default(autoincrement())
+  token     String    @unique
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+}
+
+// ---------------------------------------------------------------------------
+// Student profile
+// ---------------------------------------------------------------------------
+
+model StudentProfile {
+  id                  Int       @id @default(autoincrement())
+  userId              Int       @unique
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // "One active season at a time" — enforced by FK + business rules.
+  activeSeasonId      Int?
+  activeSeason        Season?   @relation("StudentActiveSeason", fields: [activeSeasonId], references: [id], onDelete: SetNull)
+
+  university          String?
+  year                String?
+  phone               String?
+  dateOfBirth         DateTime?
+  spiritualBackground String?
+  gifts               String?
+  notes               String?
+  photoPath           String?
+  deletedAt           DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@index([activeSeasonId])
+}
+
+// ---------------------------------------------------------------------------
+// Seasons (courses)
+// ---------------------------------------------------------------------------
+
+model Season {
+  id             Int          @id @default(autoincrement())
+  code           String       @unique // e.g. "gbv-2026" — URL identifier
+  title          String       // e.g. "GBV 2026" — display title
+  description    String?
+  startDate      DateTime
+  endDate        DateTime
+  status         SeasonStatus @default(DRAFT)
+  coverImagePath String?
+
+  createdById Int?
+  createdBy   User?     @relation("SeasonCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedById Int?
+  updatedBy   User?     @relation("SeasonUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  deletedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  admins            SeasonAdmin[]
+  groups            Group[]
+  sessions          Session[]
+  assignments       Assignment[]
+  enrollments       SeasonEnrollment[]
+  activeForStudents StudentProfile[]   @relation("StudentActiveSeason")
+  engagementNotes   EngagementNote[]
+
+  @@index([status])
+  @@index([startDate])
+}
+
+model SeasonAdmin {
+  seasonId     Int
+  season       Season   @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+  userId       Int
+  user         User     @relation("SeasonAdminUser", fields: [userId], references: [id], onDelete: Cascade)
+  assignedAt   DateTime @default(now())
+  assignedById Int?
+  assignedBy   User?    @relation("SeasonAdminAssignedBy", fields: [assignedById], references: [id], onDelete: SetNull)
+
+  @@id([seasonId, userId])
+  @@index([userId])
+}
+
+// ---------------------------------------------------------------------------
+// Groups
+// ---------------------------------------------------------------------------
+
+model Group {
+  id          Int      @id @default(autoincrement())
+  seasonId    Int
+  season      Season   @relation(fields: [seasonId], references: [id], onDelete: Restrict)
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  leaders           GroupLeader[]
+  students          GroupStudent[]
+  seasonEnrollments SeasonEnrollment[]
+  assignmentTargets AssignmentTarget[]
+
+  @@index([seasonId])
+}
+
+model GroupLeader {
+  groupId    Int
+  group      Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id], onDelete: Restrict)
+  assignedAt DateTime @default(now())
+
+  @@id([groupId, userId])
+  @@index([userId])
+}
+
+// Current group membership only. Past memberships live in SeasonEnrollment.
+// `studentUserId` is unique standalone — a student belongs to at most one current group.
+model GroupStudent {
+  groupId       Int
+  group         Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  studentUserId Int      @unique
+  studentUser   User     @relation(fields: [studentUserId], references: [id], onDelete: Restrict)
+  enrolledAt    DateTime @default(now())
+
+  @@id([groupId, studentUserId])
+  @@index([groupId])
+}
+
+// Append-only history: which students were in which seasons (and groups).
+model SeasonEnrollment {
+  id            Int              @id @default(autoincrement())
+  studentUserId Int
+  studentUser   User             @relation("EnrollmentStudent", fields: [studentUserId], references: [id], onDelete: Restrict)
+  seasonId      Int
+  season        Season           @relation(fields: [seasonId], references: [id], onDelete: Restrict)
+  groupId       Int?
+  group         Group?           @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  status        EnrollmentStatus @default(ACTIVE)
+  enrolledAt    DateTime         @default(now())
+  completedAt   DateTime?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  @@unique([studentUserId, seasonId])
+  @@index([seasonId, status])
+}
+
+// ---------------------------------------------------------------------------
+// Sessions (calendar)
+// ---------------------------------------------------------------------------
+
+model Session {
+  id                Int       @id @default(autoincrement())
+  seasonId          Int
+  season            Season    @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+  title             String
+  startsAt          DateTime
+  durationMinutes   Int       @default(90)
+  location          String?
+  description       String?
+  materialsPath     String?
+  // Sibling sessions created in the same recurrence batch share this id.
+  recurrenceGroupId String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  attendance  Attendance[]
+  assignments Assignment[]
+
+  @@index([seasonId, startsAt])
+  @@index([recurrenceGroupId])
+}
+
+model Attendance {
+  id            Int              @id @default(autoincrement())
+  sessionId     Int
+  session       Session          @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  studentUserId Int
+  studentUser   User             @relation("AttendanceStudent", fields: [studentUserId], references: [id], onDelete: Restrict)
+  status        AttendanceStatus
+  notes         String?
+  markedById    Int?
+  markedBy      User?            @relation("AttendanceMarkedBy", fields: [markedById], references: [id], onDelete: SetNull)
+  markedAt      DateTime         @default(now())
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  @@unique([sessionId, studentUserId])
+  @@index([studentUserId])
+}
+
+// ---------------------------------------------------------------------------
+// Assignments & submissions
+// ---------------------------------------------------------------------------
+
+model Assignment {
+  id          Int       @id @default(autoincrement())
+  seasonId    Int
+  season      Season    @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+  sessionId   Int?
+  session     Session?  @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+  title       String
+  description String?
+  dueAt       DateTime?
+  // When true, the assignment targets every group in the season (no AssignmentTarget rows).
+  isAllGroups Boolean   @default(false)
+
+  createdById Int?
+  createdBy   User?     @relation("AssignmentCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedById Int?
+  updatedBy   User?     @relation("AssignmentUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  deletedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  targets     AssignmentTarget[]
+  submissions Submission[]
+
+  @@index([seasonId])
+  @@index([sessionId])
+  @@index([dueAt])
+}
+
+model AssignmentTarget {
+  assignmentId Int
+  assignment   Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  groupId      Int
+  group        Group      @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
+
+  @@id([assignmentId, groupId])
+  @@index([groupId])
+}
+
+model Submission {
+  id            Int              @id @default(autoincrement())
+  // URL identifier — only this entity uses publicId per the per-entity strategy.
+  publicId      String           @unique
+  assignmentId  Int
+  assignment    Assignment       @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  studentUserId Int
+  studentUser   User             @relation("SubmissionStudent", fields: [studentUserId], references: [id], onDelete: Restrict)
+  text          String?
+  status        SubmissionStatus @default(DRAFT)
+  submittedAt   DateTime?
+  reviewedAt    DateTime?
+  feedback      String?
+  reviewedById  Int?
+  reviewedBy    User?            @relation("SubmissionReviewedBy", fields: [reviewedById], references: [id], onDelete: SetNull)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  files SubmissionFile[]
+
+  @@unique([assignmentId, studentUserId])
+  @@index([studentUserId])
+  @@index([assignmentId, status])
+}
+
+model SubmissionFile {
+  id           Int        @id @default(autoincrement())
+  submissionId Int
+  submission   Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  originalName String
+  storagePath  String
+  mimeType     String
+  sizeBytes    Int
+  uploadedAt   DateTime   @default(now())
+
+  @@index([submissionId])
+}
+
+// ---------------------------------------------------------------------------
+// Engagement notes
+// ---------------------------------------------------------------------------
+
+model EngagementNote {
+  id            Int            @id @default(autoincrement())
+  studentUserId Int
+  studentUser   User           @relation("EngagementNoteStudent", fields: [studentUserId], references: [id], onDelete: Restrict)
+  authorUserId  Int
+  authorUser    User           @relation("EngagementNoteAuthor", fields: [authorUserId], references: [id], onDelete: Restrict)
+  seasonId      Int?
+  season        Season?        @relation(fields: [seasonId], references: [id], onDelete: SetNull)
+  body          String
+  visibility    NoteVisibility @default(LEADERS)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([studentUserId, createdAt])
+  @@index([authorUserId])
+}
