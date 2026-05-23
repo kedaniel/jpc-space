@@ -139,6 +139,52 @@ Use helpers in `src/lib/rbac.ts` (`isAdminOfSeason(u, seasonId)`, `isLeaderOfGro
 
 ---
 
+## Design System Compliance
+
+Before writing ANY component, page, or UI element:
+
+1. **Read the design system showcase page** at `/dev/design-system` (or the equivalent file in `src/app/dev/design-system/`) to remind yourself of the existing component library and tokens.
+2. **Read the Tailwind theme config** (the `@theme` block in `src/app/globals.css`, or `tailwind.config.ts` if present) to confirm available tokens.
+3. **Read the existing components** in `src/components/ui/` and `src/components/layout/` before creating anything new. Reuse, don't duplicate.
+
+### Color Rules
+- ONLY use design tokens: `brand-navy-*`, `brand-teal-*`, `neutral-*`, `success-*`, `warning-*`, `error-*`, `info-*`
+- NEVER use raw Tailwind colors like `bg-blue-500`, `text-gray-700`, `bg-slate-100` — these are off-system
+- NEVER use arbitrary color values like `bg-[#abc123]` unless explicitly approved
+- Role badges must use the exact role color tokens defined in the system
+
+### Component Rules
+- NEVER create a one-off Button, Input, Card, Modal, Badge, Avatar, etc. Use the existing component from `src/components/ui/`. If it's missing a variant you need, EXTEND the component — don't fork it.
+- NEVER inline styles for spacing, radii, shadows that already exist as utilities. Use `rounded-xl` not `style={{ borderRadius: 12 }}`.
+- ALL modals/dialogs must use the responsive Modal component which becomes a bottom sheet on mobile. No custom modal implementations.
+- ALL forms must use the existing Input/Textarea/Select/DatePicker components with React Hook Form + Zod. No raw `<input>` tags.
+
+### Layout Rules
+- ALL pages must be wrapped in AppShell. Never render outside it (except `/login` and `/forgot-password`).
+- ALL navigation must come from `src/lib/navigation.ts` config — never hardcode nav items in a layout.
+- ALL pages must be MOBILE-FIRST. Design and verify at 375px width FIRST, then enhance with `md:` and `lg:` breakpoints. If you find yourself writing `md:` before testing mobile, stop and restart.
+- Touch targets minimum 44×44px on mobile.
+- Card padding: `p-4 md:p-6`. Section gap: `gap-4 md:gap-6`. Don't deviate without reason.
+
+### State Rules
+- Every list view must have an EmptyState component for the empty case.
+- Every async boundary must have a Skeleton loader matching the layout (not a spinner).
+- Every action button must show a loading state during pending Server Actions.
+- Every form field must show inline validation errors using the existing error pattern.
+
+### Verification Step (REQUIRED before declaring any screen done)
+
+After building each screen, perform this self-audit and report the results in your response:
+
+1. **Token audit**: grep the file for hardcoded colors (`#`, `rgb(`, `bg-blue`, `bg-red`, `bg-gray`, `text-gray`, etc.). Report any findings or confirm zero violations.
+2. **Component audit**: list every UI primitive used on the screen (buttons, inputs, modals, cards, badges). Confirm each comes from `src/components/ui/`.
+3. **Mobile audit**: state whether you verified the screen at 375px width and confirm no horizontal scroll, no cut-off text, no unreachable buttons.
+4. **State audit**: confirm loading state exists, empty state exists (if applicable), error state handled.
+
+If any audit fails, fix it before moving on. Do not skip this step.
+
+---
+
 ## Testing
 
 Tests are not wired up in this repo yet. When adding the first tests:
