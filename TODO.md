@@ -10,6 +10,8 @@ Items intentionally deferred from the MVP build. Track these as separate PRs.
 - **Server-side rich-text sanitization tests** — `RichTextView` sanitizes via `isomorphic-dompurify`. Once test infra exists, cover: script tags stripped, iframe stripped, allowed tags preserved, on-event attrs stripped.
 - **Real test infra** (Vitest) — pin Prisma mock, cover permission helpers, history privacy, notification fan-out.
 
+- **Submission file download** — the review screen lists attachments but doesn't serve them yet. Add a `/api/files/[id]/route.ts` GET handler that calls `getStorage().get(path)` and streams to the response, gated by `canViewSubmission`.
+
 ## Tech debt / known issues
 
 - Recharts colors are hex literals mirrored from `globals.css` in `src/lib/chart-colors.ts`. If the design token palette changes, update both files. A long-term fix is to render charts client-side and read `getComputedStyle` for CSS variables.
