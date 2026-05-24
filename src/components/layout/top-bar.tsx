@@ -1,11 +1,15 @@
 "use client";
 
-import { Bell, HelpCircle, Search } from "lucide-react";
+import { HelpCircle, Search } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { UserMenu } from "@/components/layout/user-menu";
+import {
+  NotificationBell,
+  type NotificationBellItem,
+} from "@/components/layout/notification-bell";
 import type { UserRole } from "@/generated/prisma/enums";
 
 type RoleColor = "super" | "admin" | "leader" | "mentor" | "student";
@@ -24,6 +28,10 @@ interface TopBarProps {
   userId: number;
   initials: string;
   signOutAction: () => Promise<void>;
+  notifications: NotificationBellItem[];
+  unreadCount: number;
+  notificationsHref: string;
+  markAllNotificationsReadAction: () => Promise<void>;
 }
 
 export function TopBar({
@@ -32,6 +40,10 @@ export function TopBar({
   userId,
   initials,
   signOutAction,
+  notifications,
+  unreadCount,
+  notificationsHref,
+  markAllNotificationsReadAction,
 }: TopBarProps) {
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-neutral-200 bg-white px-4 md:px-6">
@@ -60,14 +72,12 @@ export function TopBar({
         <Badge role={roleColor[role]} className="hidden md:inline-flex">
           {role}
         </Badge>
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          aria-label="Notifications"
-          className="hidden md:inline-flex"
-        >
-          <Bell />
-        </Button>
+        <NotificationBell
+          items={notifications}
+          unread={unreadCount}
+          viewAllHref={notificationsHref}
+          onMarkAllRead={markAllNotificationsReadAction}
+        />
         <Button
           variant="ghost"
           size="icon-sm"

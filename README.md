@@ -166,6 +166,48 @@ It exercises every `can*` helper for each role against representative seeded res
 
 See [DECISIONS.md](./DECISIONS.md).
 
+## MVP features
+
+End-to-end on `feat/mvp-completion`:
+
+| Feature | Routes |
+|---|---|
+| **Seasons** | `/super/seasons` CRUD + `/admin/season` |
+| **Groups** | `/admin/season/[code]/groups` CRUD with leader/student assignment via MultiSelect |
+| **Calendar / Sessions** | `/admin/season/[code]/calendar` + `/sessions/[id]` with weekly recurrence (one/future/all edit scopes) |
+| **Attendance** | `/admin/season/[code]/sessions/[id]/attendance` (admin) and `/leader/sessions/[id]/attendance` (own group); 3-consecutive-absence flag fires `LOW_ATTENDANCE_FLAG` |
+| **Assignments** | `/admin/season/[code]/assignments` CRUD with RichTextEditor, optional session link, file constraints, target-all vs target-groups |
+| **Submissions** | Student draft → submit → re-submit (read-only after due/reviewed), file uploads (validated), late detection. Leader queue at `/leader/submissions`, review at `/leader/submissions/[publicId]` |
+| **Students** | `/super/students`, `/admin/students`, `/mentor/students` (scoped), `/leader/students/[id]`; detail = Tabs (Profile / Seasons / Attendance / Submissions / Notes / Documents) + engagement score |
+| **Engagement notes** | Per-student composer with visibility (LEADERS / MENTORS / ADMINS) + follow-up flag → `MENTOR_FOLLOWUP` notification to admins |
+| **Student self-views** | `/student/{dashboard,season,calendar,assignments,history,profile}`. History page is **privacy-locked** — it never reads Submission, EngagementNote, feedback, or notes fields |
+| **Mentor module** | `/mentor/dashboard` (at-risk panel + recent activity), `/mentor/notes` (own notes feed with student picker), `/mentor/reports` |
+| **Reports** | Attendance trend (Line), submission completion (Bar), engagement distribution (Pie), at-risk list; CSV export at `/api/reports/export` (scope-checked) |
+| **Notifications** | In-app only. Bell in TopBar with unread badge + recent items + Mark-all-read; per-role `/notifications` "View all" page. Triggers: assignment created, submission reviewed, session rescheduled, low-attendance flag, mentor follow-up |
+| **Settings** | Per-role `/settings`: profile, password change (bcrypt-verified), notification preferences toggle |
+| **User management** | `/super/users` list + create + edit (role + deactivate/reactivate) |
+
+### Engagement score
+
+`(attendance% × 0.5) + (submission% × 0.5)`, computed on read in [src/lib/engagement.ts](src/lib/engagement.ts). Pure query, no caching — fine at seed sizes (≤30 students/season).
+
+### Design system
+
+All UI uses tokens from `src/app/globals.css` (brand-navy/teal, neutral, success/warning/error/info, role colors). New primitives added in this MVP:
+
+- `MultiSelect`, `Combobox`, `ChipInput` (Base UI Popover + token styling)
+- `RichTextEditor` (Tiptap StarterKit + Link) + server-safe `RichTextView` (DOMPurify-sanitized)
+- `LineChartCard` / `BarChartCard` / `PieChartCard` (Recharts wrappers; colors resolved from `src/lib/chart-colors.ts` — keep in sync with `@theme`)
+- `NotificationBell` (Popover dropdown wired into TopBar)
+
+### Known gaps (see `TODO.md`)
+
+- CSV bulk import for students — deferred; single-user create only.
+- File download endpoint for submission attachments — uploads work, listing works, but no `/api/files/[id]` route yet.
+- PDF report export — `pdf-lib` installed; CSV is wired, PDF deferred.
+- Design-system showcase additions for the new primitives.
+- The pre-existing auth pages (`/login`, `/forgot-password`, `/reset-password`, `/forbidden`) still use raw Tailwind palette colors — not in MVP scope but easy follow-up.
+
 ## Status
 
-Backend foundation only — schema, auth scaffolding, seed, storage interface. UI is intentionally out of scope for this milestone.
+Stages A–I of the MVP build are complete on `feat/mvp-completion`. Walk through each role against the seed data; see `TODO.md` for deferred items.

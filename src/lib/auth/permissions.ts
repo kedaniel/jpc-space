@@ -219,3 +219,129 @@ export async function getStudentSeasonAccess(
   }
   return { canViewSubmissions: false, isReadOnly: true };
 }
+
+// ---------------------------------------------------------------------------
+// Assignment & submission gates
+// ---------------------------------------------------------------------------
+
+export function canCreateAssignment(
+  user: SessionUser,
+  seasonId: number,
+): boolean {
+  return isAdminOfSeason(user, seasonId);
+}
+
+export async function canEditAssignment(
+  user: SessionUser,
+  assignmentId: number,
+): Promise<boolean> {
+  const a = await db.assignment.findUnique({
+    where: { id: assignmentId },
+    select: { seasonId: true },
+  });
+  if (!a) return false;
+  return isAdminOfSeason(user, a.seasonId);
+}
+
+export async function canReviewSubmission(
+  user: SessionUser,
+  submissionId: number,
+): Promise<boolean> {
+  if (isSuper(user)) return true;
+  const sub = await db.submission.findUnique({
+    where: { id: submissionId },
+    select: {
+      studentUserId: true,
+      assignment: { select: { seasonId: true } },
+    },
+  });
+  if (!sub) return false;
+  if (isAdminOfSeason(user, sub.assignment.seasonId)) return true;
+  if (user.role === "LEADER") {
+    const m = await db.groupStudent.findUnique({
+      where: { studentUserId: sub.studentUserId },
+      select: { groupId: true },
+    });
+    if (!m) return false;
+    return isLeaderOfGroup(user, m.groupId);
+  }
+  return false;
+}
+
+// ---------------------------------------------------------------------------
+// Student & notes gates
+// ---------------------------------------------------------------------------
+
+export async function canViewStudent(
+  user: SessionUser,
+  studentUserId: number,
+): Promise<boolean> {
+  if (isSuper(user) || isMentor(user)) return true;
+  if (user.userId === studentUserId) return true;
+
+  if (user.role === "ADMIN") {
+    if (user.seasonAdminIds.length === 0) return false;
+    const enrollment = await db.seasonEnrollment.findFirst({
+      where: { studentUserId, seasonId: { in: user.seasonAdminIds } },
+      select: { id: true },
+    });
+    return enrollment !== null;
+  }
+
+  if (user.role === "LEADER") {
+    if (user.groupLeaderIds.length === 0) return false;
+    const membership = await db.groupStudent.findUnique({
+      where: { studentUserId },
+      select: { groupId: true },
+    });
+    if (!membership) return false;
+    return isLeaderOfGroup(user, membership.groupId);
+  }
+
+  return false;
+}
+
+export async function canEditStudent(
+  user: SessionUser,
+  studentUserId: number,
+): Promise<boolean> {
+  if (isSuper(user)) return true;
+  if (user.userId === studentUserId) return true;
+  if (user.role === "ADMIN") {
+    const profile = await db.studentProfile.findUnique({
+      where: { userId: studentUserId },
+      select: { activeSeasonId: true },
+    });
+    if (!profile?.activeSeasonId) return false;
+    return isAdminOfSeason(user, profile.activeSeasonId);
+  }
+  return false;
+}
+
+export async function canWriteNote(
+  user: SessionUser,
+  studentUserId: number,
+): Promise<boolean> {
+  if (isSuper(user) || isMentor(user)) return true;
+  if (user.role === "ADMIN") {
+    const profile = await db.studentProfile.findUnique({
+      where: { userId: studentUserId },
+      select: { activeSeasonId: true },
+    });
+    if (!profile?.activeSeasonId) return false;
+    return isAdminOfSeason(user, profile.activeSeasonId);
+  }
+  if (user.role === "LEADER") {
+    const m = await db.groupStudent.findUnique({
+      where: { studentUserId },
+      select: { groupId: true },
+    });
+    if (!m) return false;
+    return isLeaderOfGroup(user, m.groupId);
+  }
+  return false;
+}
+
+export function canManageNotifications(user: SessionUser): boolean {
+  return isSuper(user);
+}

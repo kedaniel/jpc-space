@@ -61,6 +61,14 @@ enum NoteVisibility {
   ADMINS
 }
 
+enum NotificationType {
+  ASSIGNMENT_CREATED
+  SUBMISSION_REVIEWED
+  SESSION_RESCHEDULED
+  LOW_ATTENDANCE_FLAG
+  MENTOR_FOLLOWUP
+}
+
 // ---------------------------------------------------------------------------
 // Identity & auth
 // ---------------------------------------------------------------------------
@@ -100,6 +108,11 @@ model User {
   submissionsAsStudent Submission[]     @relation("SubmissionStudent")
   seasonEnrollments  SeasonEnrollment[] @relation("EnrollmentStudent")
   engagementNotesAbout EngagementNote[] @relation("EngagementNoteStudent")
+
+  notifications          Notification[]
+  notificationPreference NotificationPreference?
+  studentDocuments       StudentDocument[]       @relation("StudentDocumentStudent")
+  studentDocumentsUploaded StudentDocument[]     @relation("StudentDocumentUploader")
 
   @@index([role])
   @@index([deletedAt])
@@ -331,6 +344,10 @@ model Assignment {
   // When true, the assignment targets every group in the season (no AssignmentTarget rows).
   isAllGroups Boolean   @default(false)
 
+  // File upload constraints (optional — null means no file uploads accepted).
+  maxFileSizeMb         Int?
+  allowedMimeCategories String[] @default([])
+
   createdById Int?
   createdBy   User?     @relation("AssignmentCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
   updatedById Int?
@@ -408,11 +425,61 @@ model EngagementNote {
   authorUser    User           @relation("EngagementNoteAuthor", fields: [authorUserId], references: [id], onDelete: Restrict)
   seasonId      Int?
   season        Season?        @relation(fields: [seasonId], references: [id], onDelete: SetNull)
-  body          String
-  visibility    NoteVisibility @default(LEADERS)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  body             String
+  visibility       NoteVisibility @default(LEADERS)
+  followUpFlagged  Boolean        @default(false)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
 
   @@index([studentUserId, createdAt])
   @@index([authorUserId])
+}
+
+// ---------------------------------------------------------------------------
+// Notifications & documents
+// ---------------------------------------------------------------------------
+
+model Notification {
+  id        Int              @id @default(autoincrement())
+  userId    Int
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  title     String
+  body      String?
+  link      String?
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  @@index([userId, readAt])
+  @@index([userId, createdAt])
+}
+
+model NotificationPreference {
+  id     Int  @id @default(autoincrement())
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  assignmentCreated   Boolean @default(true)
+  submissionReviewed  Boolean @default(true)
+  sessionRescheduled  Boolean @default(true)
+  lowAttendanceFlag   Boolean @default(true)
+  mentorFollowup      Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model StudentDocument {
+  id            Int      @id @default(autoincrement())
+  studentUserId Int
+  studentUser   User     @relation("StudentDocumentStudent", fields: [studentUserId], references: [id], onDelete: Cascade)
+  uploadedById  Int?
+  uploadedBy    User?    @relation("StudentDocumentUploader", fields: [uploadedById], references: [id], onDelete: SetNull)
+  originalName  String
+  storagePath   String
+  mimeType      String
+  sizeBytes     Int
+  uploadedAt    DateTime @default(now())
+
+  @@index([studentUserId])
 }

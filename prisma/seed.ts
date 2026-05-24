@@ -513,6 +513,93 @@ async function main() {
   // Suppress unused warning on a3 in the small-data path.
   void a3;
 
+  console.log("→ Flagging one note for follow-up…");
+  const flagStudent = gbvStudents[2];
+  await db.engagementNote.create({
+    data: {
+      studentUserId: flagStudent.id,
+      authorUserId: mentorUsers[0].id,
+      seasonId: gbv.id,
+      body: "Hasn't responded to the last two check-ins. Worth a personal call.",
+      visibility: "MENTORS",
+      followUpFlagged: true,
+    },
+  });
+
+  console.log("→ Creating Student Documents…");
+  for (let i = 0; i < 2; i++) {
+    const student = gbvStudents[i];
+    await db.studentDocument.create({
+      data: {
+        studentUserId: student.id,
+        uploadedById: adminUsers[0].id,
+        originalName: i === 0 ? "consent-form.pdf" : "testimony.docx",
+        storagePath: `documents/2026/03/seed-${i}-${
+          i === 0 ? "consent-form.pdf" : "testimony.docx"
+        }`,
+        mimeType:
+          i === 0
+            ? "application/pdf"
+            : "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        sizeBytes: 102400 * (i + 1),
+      },
+    });
+  }
+
+  console.log("→ Creating Notifications…");
+  const notif = (
+    userId: number,
+    type:
+      | "ASSIGNMENT_CREATED"
+      | "SUBMISSION_REVIEWED"
+      | "SESSION_RESCHEDULED"
+      | "LOW_ATTENDANCE_FLAG"
+      | "MENTOR_FOLLOWUP",
+    title: string,
+    body: string | null,
+    link: string | null,
+  ) =>
+    db.notification.create({
+      data: { userId, type, title, body, link },
+    });
+
+  // Each student in the active season gets the assignment notification.
+  for (const s of gbvStudents.slice(0, 6)) {
+    await notif(
+      s.id,
+      "ASSIGNMENT_CREATED",
+      `New assignment: ${a1.title}`,
+      "Due soon — check it out.",
+      `/student/assignments/${a1.id}`,
+    );
+  }
+  // The reviewed-submission student gets feedback.
+  await notif(
+    gbvStudents[0].id,
+    "SUBMISSION_REVIEWED",
+    `Feedback ready on "${a1.title}"`,
+    null,
+    `/student/assignments/${a1.id}`,
+  );
+  // Admin gets a mentor-followup notification (the one flagged above).
+  await notif(
+    adminUsers[0].id,
+    "MENTOR_FOLLOWUP",
+    `Follow-up flagged for ${flagStudent.name ?? flagStudent.email}`,
+    "Hasn't responded to the last two check-ins.",
+    `/admin/students/${flagStudent.id}`,
+  );
+  // Leaders see a low-attendance flag.
+  for (const l of leaderUsers.slice(0, 2)) {
+    await notif(
+      l.id,
+      "LOW_ATTENDANCE_FLAG",
+      "A student in your group has 3 consecutive absences",
+      "Consider reaching out for a check-in.",
+      `/leader/groups`,
+    );
+  }
+
   console.log("\n✓ Seed complete.");
   console.log("  Sign in with any of:");
   console.log(`    super@jpc.test    / ${DEFAULT_PASSWORD}`);

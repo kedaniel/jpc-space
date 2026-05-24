@@ -2,8 +2,6 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { rolePrefixAllowed } from "@/lib/auth/post-login";
 
-export const runtime = "nodejs";
-
 const PUBLIC_PATHS = new Set<string>(["/login", "/forgot-password", "/reset-password"]);
 
 function isPublic(pathname: string): boolean {
