@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { FormField } from "@/components/ui/form-field";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -153,24 +154,21 @@ export function SettingsForm({ initialName, email, initialPrefs }: SettingsFormP
         <CardContent>
           <form onSubmit={savePassword} className="flex flex-col gap-4">
             <FormField label="Current password" required error={pwFieldErrors.currentPassword}>
-              <Input
-                type="password"
+              <PasswordInput
                 value={current}
                 onChange={(e) => setCurrent(e.target.value)}
                 autoComplete="current-password"
               />
             </FormField>
             <FormField label="New password" required error={pwFieldErrors.newPassword}>
-              <Input
-                type="password"
+              <PasswordInput
                 value={next}
                 onChange={(e) => setNext(e.target.value)}
                 autoComplete="new-password"
               />
             </FormField>
             <FormField label="Confirm new password" required error={pwFieldErrors.confirm}>
-              <Input
-                type="password"
+              <PasswordInput
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
                 autoComplete="new-password"

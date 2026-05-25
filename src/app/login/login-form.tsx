@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { loginAction, type LoginState } from "./actions";
 
 export function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
@@ -30,9 +31,8 @@ export function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
       </label>
       <label className="flex flex-col gap-1.5 text-sm">
         <span className="font-medium text-foreground">Password</span>
-        <Input
+        <PasswordInput
           name="password"
-          type="password"
           required
           autoComplete="current-password"
           size="lg"

@@ -1,6 +1,7 @@
 import { randomBytes, createHash } from "node:crypto";
 import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
+import { sendPasswordResetEmail } from "@/lib/email";
 
 const TOKEN_TTL_MS = 1000 * 60 * 60; // 1 hour
 
@@ -29,7 +30,14 @@ export async function requestPasswordReset(email: string): Promise<void> {
 
   const base = process.env.AUTH_URL ?? "http://localhost:3000";
   const link = `${base}/reset-password?token=${rawToken}`;
-  console.log(`[password-reset] dev link for ${email}: ${link}`);
+
+  try {
+    await sendPasswordResetEmail(email, link);
+  } catch (err) {
+    // Never throw: preserve "do not leak account existence" — a transport
+    // failure must not surface differently than an unknown-email submission.
+    console.error(`[password-reset] failed to send email to ${email}:`, err);
+  }
 }
 
 export async function resetPassword(

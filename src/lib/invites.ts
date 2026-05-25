@@ -2,6 +2,7 @@
 
 import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
+import { sendInviteEmail } from "@/lib/email";
 import { customAlphabet } from "nanoid";
 
 const tokenAlphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -21,6 +22,22 @@ export async function createInvite(userId: number, invitedById: number) {
   await db.inviteToken.create({
     data: { token, userId, invitedById, expiresAt },
   });
+
+  const [invitee, inviter] = await Promise.all([
+    db.user.findUnique({ where: { id: userId }, select: { email: true } }),
+    db.user.findUnique({ where: { id: invitedById }, select: { name: true } }),
+  ]);
+
+  if (invitee?.email) {
+    const base = process.env.AUTH_URL ?? "http://localhost:3000";
+    const link = `${base}/accept-invite?token=${token}`;
+    try {
+      await sendInviteEmail(invitee.email, link, inviter?.name);
+    } catch (err) {
+      console.error(`[invites] failed to send invite email to ${invitee.email}:`, err);
+    }
+  }
+
   return { token, expiresAt };
 }
 

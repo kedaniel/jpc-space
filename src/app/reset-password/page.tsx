@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Logo } from "@/components/ui/logo";
 import { resetPassword } from "@/lib/auth/password-reset";
 
@@ -51,9 +51,8 @@ export default async function ResetPasswordPage({
           <input type="hidden" name="token" value={params.token ?? ""} />
           <label className="flex flex-col gap-1.5 text-sm">
             <span className="font-medium text-foreground">New password</span>
-            <Input
+            <PasswordInput
               name="password"
-              type="password"
               required
               minLength={8}
               size="lg"
