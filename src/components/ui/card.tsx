@@ -2,13 +2,19 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
-function Card({ className, ...props }: React.ComponentProps<"div">) {
+interface CardProps extends React.ComponentProps<"div"> {
+  interactive?: boolean;
+}
+
+function Card({ className, interactive, ...props }: CardProps) {
   return (
     <div
       data-slot="card"
       className={cn(
-        "rounded-xl border border-border bg-card text-card-foreground shadow-sm",
-        className
+        "rounded-2xl border border-border/60 bg-card text-card-foreground shadow-[var(--shadow-soft)] transition-[transform,box-shadow,border-color] duration-200 ease-[var(--ease-out-soft)]",
+        interactive &&
+          "cursor-pointer hover:-translate-y-0.5 hover:shadow-[var(--shadow-pop)] hover:border-border",
+        className,
       )}
       {...props}
     />
@@ -29,7 +35,10 @@ function CardTitle({ className, ...props }: React.ComponentProps<"h3">) {
   return (
     <h3
       data-slot="card-title"
-      className={cn("text-base font-semibold leading-tight md:text-lg", className)}
+      className={cn(
+        "text-base font-semibold leading-tight tracking-tight md:text-lg",
+        className,
+      )}
       {...props}
     />
   );
@@ -60,8 +69,8 @@ function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="card-footer"
       className={cn(
-        "flex items-center gap-2 border-t border-border p-4 md:p-6",
-        className
+        "flex items-center gap-2 border-t border-border/60 p-4 md:p-6",
+        className,
       )}
       {...props}
     />

@@ -4,10 +4,26 @@ import { cn } from "@/lib/utils";
 import type { SubmissionStatus } from "@/generated/prisma/enums";
 
 const map: Record<SubmissionStatus, { label: string; classes: string }> = {
-  DRAFT: { label: "Draft", classes: "bg-neutral-100 text-neutral-700" },
-  SUBMITTED: { label: "Submitted", classes: "bg-info-100 text-info-800" },
-  REVIEWED: { label: "Reviewed", classes: "bg-success-100 text-success-800" },
-  RETURNED: { label: "Returned", classes: "bg-warning-100 text-warning-800" },
+  DRAFT: {
+    label: "Draft",
+    classes:
+      "bg-muted text-muted-foreground dark:bg-neutral-800 dark:text-neutral-300",
+  },
+  SUBMITTED: {
+    label: "Submitted",
+    classes:
+      "bg-info-100 text-info-800 dark:bg-info-950 dark:text-info-200",
+  },
+  REVIEWED: {
+    label: "Reviewed",
+    classes:
+      "bg-success-100 text-success-800 dark:bg-success-950 dark:text-success-200",
+  },
+  RETURNED: {
+    label: "Returned",
+    classes:
+      "bg-warning-100 text-warning-800 dark:bg-warning-950 dark:text-warning-200",
+  },
 };
 
 interface SubmissionStatusBadgeProps

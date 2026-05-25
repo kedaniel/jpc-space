@@ -30,16 +30,16 @@ function DataTable<Row>({
 
   return (
     <div className={cn("w-full", className)}>
-      <div className="hidden overflow-hidden rounded-lg border border-neutral-200 bg-white md:block">
+      <div className="hidden overflow-hidden rounded-2xl border border-border/60 bg-card shadow-[var(--shadow-soft)] md:block">
         <table className="w-full text-sm">
-          <thead className="border-b border-neutral-200 bg-neutral-50">
+          <thead className="border-b border-border/60 bg-muted/40">
             <tr>
               {columns.map((col) => (
                 <th
                   key={col.key}
                   scope="col"
                   className={cn(
-                    "px-4 py-2.5 text-left font-medium text-neutral-600",
+                    "px-4 py-2.5 text-left font-medium text-muted-foreground",
                     col.className
                   )}
                 >
@@ -52,13 +52,13 @@ function DataTable<Row>({
             {rows.map((row) => (
               <tr
                 key={rowKey(row)}
-                className="border-b border-neutral-100 last:border-0"
+                className="border-b border-border/40 last:border-0 transition-colors hover:bg-muted/30"
               >
                 {columns.map((col) => (
                   <td
                     key={col.key}
                     className={cn(
-                      "px-4 py-3 text-neutral-900",
+                      "px-4 py-3 text-foreground",
                       col.className
                     )}
                   >
@@ -75,7 +75,7 @@ function DataTable<Row>({
         {rows.map((row) => (
           <li
             key={rowKey(row)}
-            className="rounded-lg border border-neutral-200 bg-white p-4"
+            className="rounded-2xl border border-border/60 bg-card p-4 shadow-[var(--shadow-soft)]"
           >
             <dl className="flex flex-col gap-1.5">
               {columns.map((col) => (
@@ -83,10 +83,10 @@ function DataTable<Row>({
                   key={col.key}
                   className="flex items-baseline justify-between gap-3"
                 >
-                  <dt className="text-xs font-medium text-neutral-500">
+                  <dt className="text-xs font-medium text-muted-foreground">
                     {col.header}
                   </dt>
-                  <dd className="text-right text-sm text-neutral-900">
+                  <dd className="text-right text-sm text-foreground">
                     {col.cell(row)}
                   </dd>
                 </div>
