@@ -100,7 +100,7 @@ export function DevUserSwitcher({ users, currentUserId }: DevUserSwitcherProps) 
                         disabled={isCurrent || pending}
                         onClick={() => handleSwitch(u.email)}
                         className={cn(
-                          "flex w-full cursor-default items-center justify-between gap-2 rounded-sm px-2 py-1.5 text-sm outline-none data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground",
+                          "flex w-full cursor-pointer items-center justify-between gap-2 rounded-sm px-2 py-1.5 text-sm outline-none data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground",
                           isCurrent && "opacity-60"
                         )}
                       >

@@ -60,7 +60,7 @@ function UserMenu({ role, userId, initials, signOutAction }: UserMenuProps) {
                   <button
                     type="submit"
                     className={cn(
-                      "flex w-full cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground"
+                      "flex w-full cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground"
                     )}
                   />
                 }
