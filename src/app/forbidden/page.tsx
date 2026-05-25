@@ -13,7 +13,7 @@ async function signOutAction() {
 
 export default function ForbiddenPage() {
   return (
-    <main className="flex min-h-screen items-center justify-center px-4 py-12">
+    <main className="flex min-h-dvh items-center justify-center px-4 py-12">
       <div className="w-full max-w-sm rounded-2xl border border-border/60 bg-card/90 p-6 shadow-[var(--shadow-pop)] backdrop-blur-md md:p-8">
         <div className="mb-6 flex flex-col items-center gap-3 text-center">
           <Logo size="lg" />
