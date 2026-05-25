@@ -75,7 +75,7 @@ export function AttendanceForm({ sessionId, roster, returnHref }: AttendanceForm
 
   if (roster.length === 0) {
     return (
-      <p className="rounded-lg border border-neutral-200 bg-white p-8 text-center text-sm text-muted-foreground">
+      <p className="rounded-lg border border-border bg-card p-8 text-center text-sm text-muted-foreground">
         No students are enrolled in this scope.
       </p>
     );
@@ -83,7 +83,7 @@ export function AttendanceForm({ sessionId, roster, returnHref }: AttendanceForm
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-neutral-200 bg-white p-3">
+      <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border bg-card p-3">
         <span className="text-sm text-muted-foreground">
           Quick mark all as
         </span>
@@ -109,7 +109,7 @@ export function AttendanceForm({ sessionId, roster, returnHref }: AttendanceForm
           return (
             <li
               key={r.studentUserId}
-              className="rounded-lg border border-neutral-200 bg-white p-3"
+              className="rounded-lg border border-border bg-card p-3"
             >
               <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                 <div className="min-w-0">
@@ -134,7 +134,7 @@ export function AttendanceForm({ sessionId, roster, returnHref }: AttendanceForm
                           "inline-flex h-9 min-w-[3.25rem] items-center justify-center gap-1 rounded-md px-2 text-xs font-medium ring-1 transition-colors disabled:opacity-50",
                           active
                             ? opt.className
-                            : "ring-neutral-200 text-neutral-600 hover:bg-neutral-50",
+                            : "ring-border text-muted-foreground hover:bg-muted hover:text-foreground",
                         )}
                       >
                         <Icon className="size-3.5" />
@@ -150,10 +150,10 @@ export function AttendanceForm({ sessionId, roster, returnHref }: AttendanceForm
       </ul>
 
       {error && (
-        <p className="rounded-md bg-error-50 px-3 py-2 text-sm text-error-800">{error}</p>
+        <p className="rounded-md border border-error-200 bg-error-50 px-3 py-2 text-sm text-error-800 dark:border-error-900 dark:bg-error-950 dark:text-error-200">{error}</p>
       )}
 
-      <div className="sticky bottom-20 z-10 flex flex-col-reverse gap-2 rounded-lg border border-neutral-200 bg-white p-3 shadow-sm sm:flex-row sm:justify-end md:bottom-0">
+      <div className="sticky bottom-20 z-10 flex flex-col-reverse gap-2 rounded-lg border border-border bg-card p-3 shadow-sm sm:flex-row sm:justify-end md:bottom-0">
         <Button type="button" variant="outline" onClick={() => router.back()} disabled={pending}>
           Cancel
         </Button>

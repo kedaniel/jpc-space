@@ -1,5 +1,5 @@
 /**
- * Seed script — JPC Portal.
+ * Seed script — JPC Space.
  *
  * Creates realistic deterministic test data:
  *   - 1 Super, 3 Admins, 6 Leaders, 30 Students, 2 Mentors

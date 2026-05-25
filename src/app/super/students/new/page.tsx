@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole } from "@/lib/auth/permissions";
-import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { StudentForm } from "@/components/students/student-form";
@@ -21,7 +20,7 @@ export default async function NewStudentPage() {
   });
 
   return (
-    <AppShell user={user} title="New student">
+    <>
       <PageHeader
         title="New student"
         description="Create the user, profile, and enrollment."
@@ -35,6 +34,6 @@ export default async function NewStudentPage() {
           />
         </CardContent>
       </Card>
-    </AppShell>
+    </>
   );
 }

@@ -251,7 +251,7 @@ export function StudentForm({
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <fieldset className="rounded-lg border border-neutral-200 bg-white p-4 md:p-6">
+    <fieldset className="rounded-lg border border-border bg-card p-4 md:p-6">
       <legend className="px-1 text-sm font-semibold text-foreground">{title}</legend>
       <div className="mt-2 flex flex-col gap-4">{children}</div>
     </fieldset>

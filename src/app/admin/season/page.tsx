@@ -4,7 +4,6 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole } from "@/lib/auth/permissions";
-import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { SeasonsList, type SeasonRow } from "@/components/seasons/seasons-list";
 
@@ -16,12 +15,12 @@ export default async function AdminSeasonsPage() {
 
   if (user.seasonAdminIds.length === 0) {
     return (
-      <AppShell user={user} title="My Season">
+      <>
         <PageHeader
           title="My Season"
           description="You aren't assigned to a season yet. Contact a super-admin to be added."
         />
-      </AppShell>
+      </>
     );
   }
 
@@ -52,12 +51,12 @@ export default async function AdminSeasonsPage() {
   }));
 
   return (
-    <AppShell user={user} title="My Season">
+    <>
       <PageHeader
         title="My Season"
         description="Seasons you administer."
       />
       <SeasonsList rows={rows} basePath="/admin/season" />
-    </AppShell>
+    </>
   );
 }

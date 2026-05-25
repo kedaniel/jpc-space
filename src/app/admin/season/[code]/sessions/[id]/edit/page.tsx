@@ -5,7 +5,6 @@ import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole, canEditSeason } from "@/lib/auth/permissions";
 import { loadSeasonByCode } from "@/lib/seasons-query";
 import { loadSessionById } from "@/lib/sessions-query";
-import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { SessionForm } from "@/components/sessions/session-form";
@@ -27,7 +26,7 @@ export default async function EditSessionPage({ params }: PageProps) {
   if (session.seasonId !== season.id) redirect(`/admin/season/${season.code}/calendar`);
 
   return (
-    <AppShell user={user} title={`Edit ${session.title}`}>
+    <>
       <PageHeader title={`Edit session`} description={session.title} />
       <Card>
         <CardContent className="pt-6">
@@ -47,6 +46,6 @@ export default async function EditSessionPage({ params }: PageProps) {
           />
         </CardContent>
       </Card>
-    </AppShell>
+    </>
   );
 }

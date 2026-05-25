@@ -6,7 +6,6 @@ import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole, canEditSeason } from "@/lib/auth/permissions";
 import { loadSeasonByCode } from "@/lib/seasons-query";
 import { loadGroupById } from "@/lib/groups-query";
-import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -31,7 +30,7 @@ export default async function GroupDetailPage({ params }: PageProps) {
   if (group.seasonId !== season.id) redirect(`/admin/season/${season.code}/groups`);
 
   return (
-    <AppShell user={user} title={`${season.title} · ${group.name}`}>
+    <>
       <PageHeader
         title={group.name}
         description={group.description ?? `Group in ${season.title}.`}
@@ -92,6 +91,6 @@ export default async function GroupDetailPage({ params }: PageProps) {
           </CardContent>
         </Card>
       </div>
-    </AppShell>
+    </>
   );
 }

@@ -4,7 +4,6 @@ import { Sparkles } from "lucide-react";
 import { db } from "@/lib/db";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole } from "@/lib/auth/permissions";
-import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -21,7 +20,7 @@ export default async function StudentHistoryPage() {
   const user = await getCurrentUserOrRedirect();
   requireRole(user, ["STUDENT"]);
 
-  // Past enrollments only — exclude the student's current active season.
+  // Past enrollments only â€” exclude the student's current active season.
   const enrollments = await db.seasonEnrollment.findMany({
     where: {
       studentUserId: user.userId,
@@ -50,18 +49,18 @@ export default async function StudentHistoryPage() {
 
   if (enrollments.length === 0) {
     return (
-      <AppShell user={user} title="History">
+      <>
         <PageHeader title="History" description="Seasons you've participated in." />
         <EmptyState
           icon={Sparkles}
           title="No past seasons"
           description="Once you complete a season, it'll appear here."
         />
-      </AppShell>
+      </>
     );
   }
 
-  // Compute attendance % per past season — NO submission data fetched here.
+  // Compute attendance % per past season â€” NO submission data fetched here.
   const seasonIds = enrollments.map((e) => e.seasonId);
   const attendanceByseason = new Map<number, { total: number; present: number }>();
   for (const sid of seasonIds) {
@@ -88,7 +87,7 @@ export default async function StudentHistoryPage() {
   }
 
   return (
-    <AppShell user={user} title="History">
+    <>
       <PageHeader
         title="History"
         description="Past seasons you participated in."
@@ -106,9 +105,9 @@ export default async function StudentHistoryPage() {
                     <div>
                       <CardTitle className="text-base">{e.season.title}</CardTitle>
                       <p className="text-xs text-muted-foreground">
-                        {format(e.season.startDate, "MMM d, yyyy")} –{" "}
+                        {format(e.season.startDate, "MMM d, yyyy")} â€“{" "}
                         {format(e.season.endDate, "MMM d, yyyy")}
-                        {e.group?.name && ` · ${e.group.name}`}
+                        {e.group?.name && ` آ· ${e.group.name}`}
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-1.5">
@@ -142,6 +141,6 @@ export default async function StudentHistoryPage() {
           );
         })}
       </ol>
-    </AppShell>
+    </>
   );
 }

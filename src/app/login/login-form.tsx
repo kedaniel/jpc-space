@@ -2,6 +2,9 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { loginAction, type LoginState } from "./actions";
 
 export function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
@@ -15,37 +18,38 @@ export function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
       {callbackUrl ? (
         <input type="hidden" name="callbackUrl" value={callbackUrl} />
       ) : null}
-      <label className="flex flex-col gap-1 text-sm">
-        <span className="text-zinc-700">Email</span>
-        <input
+      <label className="flex flex-col gap-1.5 text-sm">
+        <span className="font-medium text-foreground">Email</span>
+        <Input
           name="email"
           type="email"
           required
           autoComplete="email"
-          className="rounded border border-zinc-300 px-3 py-2 text-base focus:border-zinc-500 focus:outline-none"
+          size="lg"
         />
       </label>
-      <label className="flex flex-col gap-1 text-sm">
-        <span className="text-zinc-700">Password</span>
-        <input
+      <label className="flex flex-col gap-1.5 text-sm">
+        <span className="font-medium text-foreground">Password</span>
+        <Input
           name="password"
           type="password"
           required
           autoComplete="current-password"
-          className="rounded border border-zinc-300 px-3 py-2 text-base focus:border-zinc-500 focus:outline-none"
+          size="lg"
         />
       </label>
       {state?.error ? (
-        <p className="rounded bg-red-50 px-3 py-2 text-sm text-red-700">{state.error}</p>
+        <p className="rounded-lg border border-error-200 bg-error-50 px-3 py-2 text-sm text-error-700 dark:border-error-900 dark:bg-error-950 dark:text-error-200">
+          {state.error}
+        </p>
       ) : null}
-      <button
-        type="submit"
-        disabled={pending}
-        className="rounded bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
-      >
+      <Button type="submit" size="lg" disabled={pending} className="w-full">
         {pending ? "Signing in…" : "Sign in"}
-      </button>
-      <Link href="/forgot-password" className="text-sm text-zinc-600 underline">
+      </Button>
+      <Link
+        href="/forgot-password"
+        className="text-center text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+      >
         Forgot password?
       </Link>
     </form>

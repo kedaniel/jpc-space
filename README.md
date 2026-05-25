@@ -1,4 +1,4 @@
-# JPC Portal
+# JPC Space
 
 Community management web app for **Jesus Project Community (JPC)** — a Christian student community organized into seasonal discipleship courses (e.g., "GBV 2026", "TW 2025").
 

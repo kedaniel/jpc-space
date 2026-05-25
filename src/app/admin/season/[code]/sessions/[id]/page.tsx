@@ -8,7 +8,6 @@ import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole, canEditSeason } from "@/lib/auth/permissions";
 import { loadSeasonByCode } from "@/lib/seasons-query";
 import { loadSessionById } from "@/lib/sessions-query";
-import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -34,7 +33,7 @@ export default async function SessionDetailPage({ params }: PageProps) {
   if (session.seasonId !== season.id) redirect(`/admin/season/${season.code}/calendar`);
 
   return (
-    <AppShell user={user} title={`${season.title} · ${session.title}`}>
+    <>
       <PageHeader
         title={session.title}
         description={`${format(session.startsAt, "EEE, MMM d, yyyy · h:mm a")} · ${session.durationMinutes} min`}
@@ -83,6 +82,6 @@ export default async function SessionDetailPage({ params }: PageProps) {
           )}
         </CardContent>
       </Card>
-    </AppShell>
+    </>
   );
 }

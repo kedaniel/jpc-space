@@ -4,7 +4,6 @@ import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole, canViewStudent, canEditStudent, canWriteNote } from "@/lib/auth/permissions";
 import { filterVisibleNotes, loadStudentDetail } from "@/lib/students-query";
 import { computeEngagementForStudent } from "@/lib/engagement";
-import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { StudentDetail } from "@/components/students/student-detail";
 
@@ -28,7 +27,7 @@ export default async function SuperStudentDetailPage({ params }: PageProps) {
   const visibleNotes = filterVisibleNotes(student.notes, user);
 
   return (
-    <AppShell user={user} title={student.name ?? student.email}>
+    <>
       <PageHeader
         title={student.name ?? student.email}
         description={student.email}
@@ -41,6 +40,6 @@ export default async function SuperStudentDetailPage({ params }: PageProps) {
         canWriteNote={await canWriteNote(user, studentUserId)}
         editHref={`/super/students/${student.id}/edit`}
       />
-    </AppShell>
+    </>
   );
 }

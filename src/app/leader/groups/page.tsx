@@ -4,7 +4,6 @@ import { Users } from "lucide-react";
 import { db } from "@/lib/db";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole } from "@/lib/auth/permissions";
-import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -17,14 +16,14 @@ export default async function LeaderGroupsPage() {
 
   if (user.groupLeaderIds.length === 0) {
     return (
-      <AppShell user={user} title="My groups">
+      <>
         <PageHeader title="My groups" description="You don't lead any groups yet." />
         <EmptyState
           icon={Users}
           title="No groups"
           description="An admin will add you to a group when you're ready."
         />
-      </AppShell>
+      </>
     );
   }
 
@@ -46,7 +45,7 @@ export default async function LeaderGroupsPage() {
   });
 
   return (
-    <AppShell user={user} title="My groups">
+    <>
       <PageHeader
         title="My groups"
         description={`${groups.length} group${groups.length === 1 ? "" : "s"}`}
@@ -63,7 +62,7 @@ export default async function LeaderGroupsPage() {
                 href="/leader/calendar"
                 className="text-sm font-medium text-brand-teal-700 hover:underline"
               >
-                Calendar →
+                Calendar â†’
               </Link>
             </CardHeader>
             <CardContent>
@@ -87,6 +86,6 @@ export default async function LeaderGroupsPage() {
           </Card>
         ))}
       </div>
-    </AppShell>
+    </>
   );
 }

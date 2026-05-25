@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole } from "@/lib/auth/permissions";
-import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { UserForm } from "@/components/users/user-form";
@@ -25,7 +24,7 @@ export default async function EditUserPage({ params }: PageProps) {
   if (!target) notFound();
 
   return (
-    <AppShell user={user} title={`Edit ${target.name ?? target.email}`}>
+    <>
       <PageHeader
         title={`Edit ${target.name ?? target.email}`}
         description={target.email}
@@ -44,6 +43,6 @@ export default async function EditUserPage({ params }: PageProps) {
           />
         </CardContent>
       </Card>
-    </AppShell>
+    </>
   );
 }

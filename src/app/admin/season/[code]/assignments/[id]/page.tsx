@@ -7,7 +7,6 @@ import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole, canEditSeason } from "@/lib/auth/permissions";
 import { loadSeasonByCode } from "@/lib/seasons-query";
 import { loadAssignmentById, loadSubmissionTracker } from "@/lib/assignments-query";
-import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -38,7 +37,7 @@ export default async function AdminAssignmentDetailPage({ params }: PageProps) {
   const submitted = tracker.filter((r) => r.status !== "PENDING").length;
 
   return (
-    <AppShell user={user} title={`${season.title} · ${assignment.title}`}>
+    <>
       <PageHeader
         title={assignment.title}
         description={
@@ -91,6 +90,6 @@ export default async function AdminAssignmentDetailPage({ params }: PageProps) {
         rows={tracker}
         reviewBasePath="/leader/submissions"
       />
-    </AppShell>
+    </>
   );
 }

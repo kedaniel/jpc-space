@@ -4,7 +4,6 @@ import { Bell, BellOff } from "lucide-react";
 
 import { db } from "@/lib/db";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
-import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -28,7 +27,7 @@ export async function NotificationsPageBody() {
   });
 
   return (
-    <AppShell user={user} title="Notifications">
+    <>
       <PageHeader
         title="Notifications"
         description={`${notifications.filter((n) => !n.readAt).length} unread of ${notifications.length}`}
@@ -64,7 +63,7 @@ export async function NotificationsPageBody() {
                       <p className="text-sm text-muted-foreground">{n.body}</p>
                     )}
                     <p className="text-xs text-muted-foreground">
-                      {format(n.createdAt, "MMM d, yyyy · h:mm a")} ·{" "}
+                      {format(n.createdAt, "MMM d, yyyy آ· h:mm a")} آ·{" "}
                       {formatDistanceToNow(n.createdAt, { addSuffix: true })}
                     </p>
                   </div>
@@ -85,6 +84,6 @@ export async function NotificationsPageBody() {
           })}
         </ul>
       )}
-    </AppShell>
+    </>
   );
 }

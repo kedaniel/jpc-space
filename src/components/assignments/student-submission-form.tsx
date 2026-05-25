@@ -193,7 +193,7 @@ export function StudentSubmissionForm({
                 {files.map((f) => (
                   <li
                     key={f.id}
-                    className="flex items-center justify-between gap-2 rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm"
+                    className="flex items-center justify-between gap-2 rounded-md border border-border bg-card px-3 py-2 text-sm"
                   >
                     <span className="inline-flex items-center gap-2 truncate">
                       <FileIcon className="size-4 shrink-0 text-muted-foreground" />

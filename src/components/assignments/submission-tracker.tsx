@@ -77,7 +77,7 @@ export function SubmissionTracker({ rows, reviewBasePath }: SubmissionTrackerPro
       rows={rows}
       rowKey={(r) => r.studentUserId}
       emptyState={
-        <p className="rounded-lg border border-dashed border-neutral-300 bg-neutral-50 p-6 text-center text-sm text-muted-foreground">
+        <p className="rounded-lg border border-dashed border-border bg-muted/40 p-6 text-center text-sm text-muted-foreground">
           No students targeted by this assignment.
         </p>
       }

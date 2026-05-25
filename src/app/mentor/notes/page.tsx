@@ -5,7 +5,6 @@ import { Flag } from "lucide-react";
 import { db } from "@/lib/db";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole } from "@/lib/auth/permissions";
-import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -51,7 +50,7 @@ export default async function MentorNotesPage({
   ]);
 
   return (
-    <AppShell user={user} title="My notes">
+    <>
       <PageHeader
         title="My notes"
         description={`${notes.length} note${notes.length === 1 ? "" : "s"} you've authored`}
@@ -101,11 +100,11 @@ export default async function MentorNotesPage({
                     >
                       {n.studentUser.name ?? n.studentUser.email}
                     </Link>
-                    <span>·</span>
+                    <span>آ·</span>
                     <span>{format(n.createdAt, "MMM d, yyyy")}</span>
                     {n.season?.title && (
                       <>
-                        <span>·</span>
+                        <span>آ·</span>
                         <span>{n.season.title}</span>
                       </>
                     )}
@@ -128,6 +127,6 @@ export default async function MentorNotesPage({
           ))}
         </ul>
       )}
-    </AppShell>
+    </>
   );
 }

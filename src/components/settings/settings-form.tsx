@@ -203,7 +203,7 @@ export function SettingsForm({ initialName, email, initialPrefs }: SettingsFormP
           {PREF_LABELS.map((p) => (
             <label
               key={p.key}
-              className="flex items-start justify-between gap-3 rounded-md border border-neutral-200 bg-neutral-50 p-3"
+              className="flex items-start justify-between gap-3 rounded-md border border-border bg-muted/40 p-3"
             >
               <span className="flex flex-col">
                 <span className="text-sm font-medium">{p.label}</span>

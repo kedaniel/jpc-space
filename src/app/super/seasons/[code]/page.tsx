@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole } from "@/lib/auth/permissions";
 import { loadSeasonByCode } from "@/lib/seasons-query";
-import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { SeasonDetail } from "@/components/seasons/season-detail";
 
@@ -23,7 +22,7 @@ export default async function SuperSeasonDetailPage({ params }: PageProps) {
   const season = await loadSeasonByCode(code);
 
   return (
-    <AppShell user={user} title={season.title}>
+    <>
       <PageHeader title={season.title} description={`Code: ${season.code}`} />
       <SeasonDetail
         season={season}
@@ -32,6 +31,6 @@ export default async function SuperSeasonDetailPage({ params }: PageProps) {
         groupsHref={`/super/seasons/${season.code}/groups`}
         calendarHref="/super/calendar"
       />
-    </AppShell>
+    </>
   );
 }

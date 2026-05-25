@@ -1,6 +1,4 @@
-@AGENTS.md
-
-# JPC Portal — Claude Context
+# JPC Space — Claude Context
 
 ## Project Overview
 
@@ -9,6 +7,22 @@ A seasonal program-management portal. Admins run **Seasons** (courses) containin
 Built with **Next.js 16 App Router**, **React 19**, **TypeScript**, **Prisma 7** (PostgreSQL via `@prisma/adapter-pg`), **Auth.js v5** (`next-auth@5-beta`, credentials provider), **Tailwind v4**, and shadcn-style components on top of **Base UI** (`@base-ui/react`). Package manager is **npm**.
 
 > This is **not** the Next.js you may know — Next 16 / React 19 / Prisma 7 / Auth.js v5 all have breaking changes. Read the relevant guide under `node_modules/next/dist/docs/` before writing code that touches framework APIs.
+
+---
+
+## First-time setup (Claude Code)
+
+This repo ships its Claude Code configuration in `.claude/` so every collaborator gets the same plugins, custom skill, and slash commands. After cloning:
+
+1. **Install Claude Code** — see https://docs.claude.com/en/docs/claude-code/overview
+2. **Open this project in Claude Code.** On first launch it reads `.claude/settings.json` and prompts you to install any missing plugins from the built-in `claude-plugins-official` marketplace (auto-installed by Claude Code itself — no separate registry setup):
+   - `superpowers` — workflow skills (TDD, brainstorming, code review, …)
+   - `frontend-design` — UI design quality guidance
+   - `chrome-devtools-mcp` — Chrome DevTools MCP server (bundled with the plugin; no separate `.mcp.json` needed)
+3. **Accept the install prompts** for all three.
+4. **Verify** with `/plugin list` (all three should show enabled) and `/skills` (you should see `jpc-design`, `init-feature`, `finalize-feature`, plus the `superpowers:*` and `frontend-design:*` skills).
+
+User-specific state — `.claude/settings.local.json` (your personal `permissions.allow` list), `.claude/cache/`, `.claude/local/`, `.claude/.session` — is gitignored. Add your own permission allowlist to `settings.local.json`; do not edit the shared `settings.json` for personal preferences.
 
 ---
 

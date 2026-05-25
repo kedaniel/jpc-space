@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole } from "@/lib/auth/permissions";
-import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { SeasonForm } from "@/components/seasons/season-form";
@@ -14,7 +13,7 @@ export default async function NewSeasonPage() {
   requireRole(user, ["SUPER"]);
 
   return (
-    <AppShell user={user} title="New season">
+    <>
       <PageHeader
         title="New season"
         description="Set up a new program season."
@@ -24,6 +23,6 @@ export default async function NewSeasonPage() {
           <SeasonForm mode="create" />
         </CardContent>
       </Card>
-    </AppShell>
+    </>
   );
 }

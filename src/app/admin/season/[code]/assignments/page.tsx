@@ -6,7 +6,6 @@ import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole, canEditSeason } from "@/lib/auth/permissions";
 import { loadSeasonByCode } from "@/lib/seasons-query";
 import { listAssignmentsForSeason } from "@/lib/assignments-query";
-import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { AssignmentsList } from "@/components/assignments/assignments-list";
@@ -31,7 +30,7 @@ export default async function AdminAssignmentsPage({ params }: PageProps) {
   const createHref = `/admin/season/${season.code}/assignments/new`;
 
   return (
-    <AppShell user={user} title={`${season.title} · Assignments`}>
+    <>
       <PageHeader
         title="Assignments"
         description={`${rows.length} assignment${rows.length === 1 ? "" : "s"}`}
@@ -42,6 +41,6 @@ export default async function AdminAssignmentsPage({ params }: PageProps) {
         basePath={`/admin/season/${season.code}/assignments`}
         createHref={createHref}
       />
-    </AppShell>
+    </>
   );
 }

@@ -25,7 +25,7 @@ Print the following checklist so the user keeps it in mind while working:
 
 ---
 
-### JPC Portal — Clean Code Checklist
+### JPC Space — Clean Code Checklist
 
 **TypeScript**
 - [ ] Never use `any` — always define explicit types

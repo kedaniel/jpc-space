@@ -28,20 +28,20 @@ function Progress({
       {(label || showValue) && (
         <div className="flex items-center justify-between text-sm">
           {label ? (
-            <ProgressPrimitive.Label className="font-medium text-neutral-700">
+            <ProgressPrimitive.Label className="font-medium text-foreground">
               {label}
             </ProgressPrimitive.Label>
           ) : (
             <span />
           )}
           {showValue ? (
-            <ProgressPrimitive.Value className="text-neutral-500 tabular-nums">
+            <ProgressPrimitive.Value className="text-muted-foreground tabular-nums">
               {(formatted) => `${formatted ?? value ?? 0}`}
             </ProgressPrimitive.Value>
           ) : null}
         </div>
       )}
-      <ProgressPrimitive.Track className="h-2 w-full overflow-hidden rounded-full bg-neutral-200">
+      <ProgressPrimitive.Track className="h-2 w-full overflow-hidden rounded-full bg-muted">
         <ProgressPrimitive.Indicator className="h-full bg-brand-teal-500 transition-[width] duration-300" />
       </ProgressPrimitive.Track>
     </ProgressPrimitive.Root>

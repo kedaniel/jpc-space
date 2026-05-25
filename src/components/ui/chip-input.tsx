@@ -67,7 +67,7 @@ export function ChipInput({
             onClick={() => remove(i)}
             disabled={disabled}
             aria-label={`Remove ${v}`}
-            className="inline-flex size-4 items-center justify-center rounded-sm hover:bg-neutral-200/60"
+            className="inline-flex size-4 items-center justify-center rounded-sm hover:bg-muted"
           >
             <X className="size-3" />
           </button>

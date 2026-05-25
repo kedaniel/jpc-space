@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { motion } from "framer-motion";
 import {
   Calendar,
   ClipboardList,
@@ -21,6 +22,7 @@ import {
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { springSoft } from "@/lib/motion";
 import type { NavIconName } from "@/lib/navigation";
 
 const iconMap: Record<NavIconName, LucideIcon> = {
@@ -46,9 +48,10 @@ interface NavLinkProps {
   label: string;
   icon: NavIconName;
   variant: "sidebar" | "tab";
+  compact?: boolean;
 }
 
-function NavLink({ href, label, icon, variant }: NavLinkProps) {
+function NavLink({ href, label, icon, variant, compact = false }: NavLinkProps) {
   const pathname = usePathname();
   const isActive = pathname === href || pathname.startsWith(`${href}/`);
   const Icon = iconMap[icon];
@@ -59,12 +62,19 @@ function NavLink({ href, label, icon, variant }: NavLinkProps) {
         href={href}
         aria-current={isActive ? "page" : undefined}
         className={cn(
-          "flex min-h-[44px] flex-1 flex-col items-center justify-center gap-0.5 rounded-md px-2 py-1 text-xs font-medium transition-colors",
+          "relative flex min-h-[56px] flex-1 flex-col items-center justify-center gap-0.5 rounded-lg px-2 py-1 text-xs font-medium transition-colors",
           isActive
-            ? "text-brand-teal-600"
-            : "text-neutral-500 hover:text-neutral-900"
+            ? "text-foreground"
+            : "text-muted-foreground hover:text-foreground",
         )}
       >
+        {isActive ? (
+          <motion.span
+            layoutId="nav-tab-active"
+            transition={springSoft}
+            className="absolute inset-x-3 top-1 h-[3px] rounded-full bg-brand-teal-500"
+          />
+        ) : null}
         <Icon className="size-5" />
         <span className="truncate">{label}</span>
       </Link>
@@ -76,14 +86,16 @@ function NavLink({ href, label, icon, variant }: NavLinkProps) {
       href={href}
       aria-current={isActive ? "page" : undefined}
       className={cn(
-        "relative flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+        "relative flex items-center rounded-lg text-sm font-medium transition-colors",
+        compact ? "justify-center p-2" : "gap-3 px-4 py-3",
         isActive
-          ? "bg-brand-navy-800 text-white before:absolute before:inset-y-1 before:left-0 before:w-1 before:rounded-r before:bg-brand-teal-500"
-          : "text-white/70 hover:bg-brand-navy-800/60 hover:text-white"
+          ? "bg-primary text-primary-foreground"
+          : "text-white/70 hover:bg-sidebar-accent hover:text-white",
       )}
+      title={compact ? label : undefined}
     >
-      <Icon className="size-4 shrink-0" />
-      <span className="truncate">{label}</span>
+      <Icon className={cn("shrink-0", compact ? "size-6" : "size-5")} />
+      {!compact && <span className="truncate">{label}</span>}
     </Link>
   );
 }

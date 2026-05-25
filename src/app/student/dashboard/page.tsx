@@ -7,8 +7,8 @@ import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole } from "@/lib/auth/permissions";
 import { computeEngagementForStudent } from "@/lib/engagement";
 import { listAssignmentsForStudent } from "@/lib/assignments-query";
-import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
+import { StaggerReveal } from "@/components/motion/stagger-reveal";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -82,7 +82,7 @@ export default async function StudentDashboard() {
   }
 
   return (
-    <AppShell user={user} title="Dashboard">
+    <>
       <PageHeader
         title={`Hi, ${profile?.name?.split(" ")[0] ?? "there"}`}
         description={
@@ -101,7 +101,7 @@ export default async function StudentDashboard() {
       )}
 
       {season && (
-        <div className="flex flex-col gap-4">
+        <StaggerReveal className="flex flex-col gap-4 md:gap-6">
           {engagement && (
             <Card>
               <CardHeader>
@@ -115,7 +115,7 @@ export default async function StudentDashboard() {
                   </span>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Week {weeksCompleted} of {weeksTotal} ·{" "}
+                  Week {weeksCompleted} of {weeksTotal} آ·{" "}
                   {engagement.submissionsCompleted}/{engagement.submissionsExpected}{" "}
                   assignments submitted
                 </p>
@@ -135,9 +135,9 @@ export default async function StudentDashboard() {
                 <div className="flex flex-col gap-1">
                   <p className="font-medium">{nextSession.title}</p>
                   <p className="text-sm text-muted-foreground">
-                    {format(nextSession.startsAt, "EEE, MMM d · h:mm a")} ·{" "}
+                    {format(nextSession.startsAt, "EEE, MMM d آ· h:mm a")} آ·{" "}
                     {nextSession.durationMinutes} min
-                    {nextSession.location ? ` · ${nextSession.location}` : ""}
+                    {nextSession.location ? ` آ· ${nextSession.location}` : ""}
                   </p>
                   <p className="text-xs text-info-700">
                     Starts {formatDistanceToNowStrict(nextSession.startsAt, { addSuffix: true })}
@@ -161,7 +161,7 @@ export default async function StudentDashboard() {
             <CardContent>
               {pending.length === 0 ? (
                 <p className="text-sm italic text-muted-foreground">
-                  Nothing pending — great job staying on top of it.
+                  Nothing pending â€” great job staying on top of it.
                 </p>
               ) : (
                 <ul className="flex flex-col divide-y divide-border">
@@ -235,9 +235,9 @@ export default async function StudentDashboard() {
             <QuickLink href="/student/history" icon={<Sparkles />} label="History" />
             <QuickLink href="/student/profile" icon={<User />} label="Profile" />
           </div>
-        </div>
+        </StaggerReveal>
       )}
-    </AppShell>
+    </>
   );
 }
 
@@ -253,9 +253,11 @@ function QuickLink({
   return (
     <Link
       href={href}
-      className="flex flex-col items-center justify-center gap-1 rounded-lg border border-neutral-200 bg-white p-3 text-sm font-medium text-foreground transition-colors hover:border-brand-teal-400 hover:bg-brand-teal-50"
+      className="group flex flex-col items-center justify-center gap-1.5 rounded-2xl border border-border/60 bg-card p-4 text-sm font-medium text-foreground shadow-[var(--shadow-soft)] transition-[transform,box-shadow,border-color] duration-200 ease-[var(--ease-out-soft)] hover:-translate-y-0.5 hover:border-brand-teal-400 hover:shadow-[var(--shadow-pop)]"
     >
-      <span className="text-brand-teal-700 [&_svg]:size-5">{icon}</span>
+      <span className="inline-flex size-9 items-center justify-center rounded-full bg-brand-teal-100 text-brand-teal-700 transition-colors group-hover:bg-brand-teal-200 dark:bg-brand-teal-900 dark:text-brand-teal-200 dark:group-hover:bg-brand-teal-800 [&_svg]:size-4">
+        {icon}
+      </span>
       {label}
     </Link>
   );

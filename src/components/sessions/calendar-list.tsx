@@ -52,7 +52,7 @@ export function CalendarList({
       {sessions.map((s) => (
         <li
           key={s.id}
-          className="rounded-lg border border-neutral-200 bg-white p-4"
+          className="rounded-lg border border-border bg-card p-4"
         >
           <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
             <div className="flex flex-1 flex-col gap-1">

@@ -222,7 +222,7 @@ export function AssignmentForm({
         />
       </FormField>
 
-      <fieldset className="rounded-lg border border-neutral-200 p-4">
+      <fieldset className="rounded-lg border border-border p-4">
         <legend className="px-1 text-sm font-medium">File submissions</legend>
         <label className="mt-2 inline-flex items-center gap-2 text-sm">
           <input type="checkbox" {...register("acceptsFiles")} className="size-4" />
@@ -256,7 +256,7 @@ export function AssignmentForm({
         )}
       </fieldset>
 
-      <fieldset className="rounded-lg border border-neutral-200 p-4">
+      <fieldset className="rounded-lg border border-border p-4">
         <legend className="px-1 text-sm font-medium">Assign to</legend>
         <div className="mt-2 flex flex-col gap-2">
           <label className="inline-flex items-center gap-2 text-sm">

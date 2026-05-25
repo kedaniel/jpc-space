@@ -7,7 +7,6 @@ import { requireRole } from "@/lib/auth/permissions";
 import { canMarkAttendance } from "@/lib/auth/permissions";
 import { loadSeasonByCode } from "@/lib/seasons-query";
 import { loadAttendanceRoster, loadSessionById } from "@/lib/sessions-query";
-import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { AttendanceForm } from "@/components/sessions/attendance-form";
 
@@ -29,7 +28,7 @@ export default async function SessionAttendancePage({ params }: PageProps) {
   const roster = await loadAttendanceRoster(session.id);
 
   return (
-    <AppShell user={user} title={`Attendance · ${session.title}`}>
+    <>
       <PageHeader
         title={`Attendance — ${session.title}`}
         description={format(session.startsAt, "EEE, MMM d, yyyy · h:mm a")}
@@ -39,6 +38,6 @@ export default async function SessionAttendancePage({ params }: PageProps) {
         roster={roster}
         returnHref={`/admin/season/${season.code}/sessions/${session.id}`}
       />
-    </AppShell>
+    </>
   );
 }

@@ -8,7 +8,6 @@ import {
   ensureDraftSubmission,
 } from "@/lib/assignment-actions";
 import { loadAssignmentById } from "@/lib/assignments-query";
-import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { RichTextView } from "@/components/ui/rich-text-view";
@@ -55,7 +54,7 @@ export default async function StudentAssignmentPage({ params }: PageProps) {
   if (!submission) redirect("/student/assignments");
 
   return (
-    <AppShell user={user} title={assignment.title}>
+    <>
       <PageHeader
         title={assignment.title}
         description={
@@ -84,6 +83,6 @@ export default async function StudentAssignmentPage({ params }: PageProps) {
         maxFileSizeMb={assignment.maxFileSizeMb}
         allowedMimeCategories={assignment.allowedMimeCategories}
       />
-    </AppShell>
+    </>
   );
 }

@@ -6,7 +6,6 @@ import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole, canEditSeason } from "@/lib/auth/permissions";
 import { loadSeasonByCode } from "@/lib/seasons-query";
 import { listGroupsForSeason } from "@/lib/groups-query";
-import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { GroupsList } from "@/components/groups/groups-list";
@@ -31,7 +30,7 @@ export default async function AdminGroupsPage({ params }: PageProps) {
   const createHref = `/admin/season/${season.code}/groups/new`;
 
   return (
-    <AppShell user={user} title={`${season.title} · Groups`}>
+    <>
       <PageHeader
         title="Groups"
         description={`${groups.length} group${groups.length === 1 ? "" : "s"} in ${season.title}`}
@@ -42,6 +41,6 @@ export default async function AdminGroupsPage({ params }: PageProps) {
         basePath={`/admin/season/${season.code}/groups`}
         createHref={createHref}
       />
-    </AppShell>
+    </>
   );
 }

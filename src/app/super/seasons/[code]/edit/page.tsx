@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole } from "@/lib/auth/permissions";
-import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { SeasonForm } from "@/components/seasons/season-form";
@@ -36,7 +35,7 @@ export default async function EditSeasonPage({ params }: PageProps) {
   if (!season) notFound();
 
   return (
-    <AppShell user={user} title={`Edit · ${season.title}`}>
+    <>
       <PageHeader
         title={`Edit · ${season.title}`}
         description={`Code: ${season.code}`}
@@ -58,6 +57,6 @@ export default async function EditSeasonPage({ params }: PageProps) {
           />
         </CardContent>
       </Card>
-    </AppShell>
+    </>
   );
 }

@@ -5,7 +5,6 @@ import { Users } from "lucide-react";
 import { db } from "@/lib/db";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole } from "@/lib/auth/permissions";
-import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -20,14 +19,14 @@ export default async function StudentSeasonPage() {
 
   if (!user.activeSeasonId) {
     return (
-      <AppShell user={user} title="Current season">
+      <>
         <PageHeader title="Current season" description="You aren't enrolled in an active season." />
         <EmptyState
           icon={Users}
           title="No active season"
           description="An admin will enroll you when you're ready."
         />
-      </AppShell>
+      </>
     );
   }
 
@@ -45,9 +44,9 @@ export default async function StudentSeasonPage() {
   });
   if (!season) {
     return (
-      <AppShell user={user} title="Current season">
+      <>
         <PageHeader title="Current season" description="Season not found." />
-      </AppShell>
+      </>
     );
   }
 
@@ -78,10 +77,10 @@ export default async function StudentSeasonPage() {
   });
 
   return (
-    <AppShell user={user} title={season.title}>
+    <>
       <PageHeader
         title={season.title}
-        description={`${format(season.startDate, "MMM d, yyyy")} – ${format(season.endDate, "MMM d, yyyy")}`}
+        description={`${format(season.startDate, "MMM d, yyyy")} â€“ ${format(season.endDate, "MMM d, yyyy")}`}
       />
 
       <div className="mb-4 flex flex-wrap gap-2">
@@ -125,7 +124,7 @@ export default async function StudentSeasonPage() {
               </p>
               <ul className="mt-1 grid grid-cols-1 gap-1 text-sm md:grid-cols-2">
                 {membership.group.students.map((s) => (
-                  <li key={s.studentUser.id}>{s.studentUser.name ?? "—"}</li>
+                  <li key={s.studentUser.id}>{s.studentUser.name ?? "â€”"}</li>
                 ))}
               </ul>
             </div>
@@ -149,8 +148,8 @@ export default async function StudentSeasonPage() {
                 <li key={s.id} className="py-2 first:pt-0 last:pb-0">
                   <p className="text-sm font-medium">{s.title}</p>
                   <p className="text-xs text-muted-foreground">
-                    {format(s.startsAt, "EEE, MMM d · h:mm a")}
-                    {s.location && ` · ${s.location}`}
+                    {format(s.startsAt, "EEE, MMM d آ· h:mm a")}
+                    {s.location && ` آ· ${s.location}`}
                   </p>
                 </li>
               ))}
@@ -158,6 +157,6 @@ export default async function StudentSeasonPage() {
           )}
         </CardContent>
       </Card>
-    </AppShell>
+    </>
   );
 }

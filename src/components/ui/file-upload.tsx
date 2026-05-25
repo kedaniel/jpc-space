@@ -58,24 +58,26 @@ function FileUpload({
         className={cn(
           "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed px-4 py-8 text-center transition-colors",
           dragOver
-            ? "border-brand-teal-500 bg-brand-teal-50"
-            : "border-neutral-300 bg-neutral-50 hover:border-brand-teal-400 hover:bg-brand-teal-50/50",
-          error && "border-error-500 bg-error-50"
+            ? "border-brand-teal-500 bg-brand-teal-50 dark:bg-brand-teal-950/40"
+            : "border-border bg-muted/40 hover:border-brand-teal-400 hover:bg-brand-teal-50/50 dark:hover:bg-brand-teal-950/30",
+          error && "border-error-500 bg-error-50 dark:bg-error-950/40"
         )}
       >
         <UploadCloud
           className={cn(
             "size-8",
-            dragOver ? "text-brand-teal-600" : "text-neutral-400"
+            dragOver ? "text-brand-teal-600" : "text-muted-foreground"
           )}
         />
         <div className="flex flex-col gap-0.5">
-          <span className="text-sm font-medium text-neutral-900">
-            <span className="text-brand-teal-600">Click to upload</span> or drag
-            and drop
+          <span className="text-sm font-medium text-foreground">
+            <span className="text-brand-teal-600 dark:text-brand-teal-400">
+              Click to upload
+            </span>{" "}
+            or drag and drop
           </span>
           {maxSizeMb ? (
-            <span className="text-xs text-neutral-500">
+            <span className="text-xs text-muted-foreground">
               Up to {maxSizeMb} MB{accept ? ` · ${accept}` : ""}
             </span>
           ) : null}
@@ -100,10 +102,10 @@ function FileUpload({
           {files.map((f, i) => (
             <li
               key={`${f.name}-${i}`}
-              className="flex items-center justify-between gap-2 rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm"
+              className="flex items-center justify-between gap-2 rounded-md border border-border bg-card px-3 py-2 text-sm"
             >
-              <span className="truncate text-neutral-900">{f.name}</span>
-              <span className="shrink-0 text-xs text-neutral-500 tabular-nums">
+              <span className="truncate text-foreground">{f.name}</span>
+              <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
                 {(f.size / 1024).toFixed(1)} KB
               </span>
               <Button

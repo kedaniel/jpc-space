@@ -1,4 +1,4 @@
-// JPC Portal — Prisma schema
+// JPC Space — Prisma schema
 // Review gate: this schema must be approved by the user before `prisma migrate dev` is run.
 // Conventions:
 //   - Integer PKs (serial4) via `Int @id @default(autoincrement())` — see DECISIONS.md for why not BigInt.

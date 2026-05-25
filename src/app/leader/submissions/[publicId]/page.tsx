@@ -9,7 +9,6 @@ import {
   canReviewSubmission,
 } from "@/lib/auth/permissions";
 import { loadSubmissionByPublicId } from "@/lib/submissions-query";
-import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -38,7 +37,7 @@ export default async function LeaderSubmissionDetailPage({ params }: PageProps) 
       : false;
 
   return (
-    <AppShell user={user} title={`${submission.studentName ?? submission.studentEmail}`}>
+    <>
       <PageHeader
         title={submission.assignmentTitle}
         description={`${submission.studentName ?? submission.studentEmail}${submission.groupName ? ` · ${submission.groupName}` : ""}`}
@@ -83,7 +82,7 @@ export default async function LeaderSubmissionDetailPage({ params }: PageProps) 
               {submission.files.map((f) => (
                 <div
                   key={f.id}
-                  className="flex items-center justify-between gap-2 rounded-md border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm"
+                  className="flex items-center justify-between gap-2 rounded-md border border-border bg-muted/40 px-3 py-2 text-sm"
                 >
                   <span className="inline-flex items-center gap-2 truncate">
                     <FileIcon className="size-4 shrink-0 text-muted-foreground" />
@@ -118,6 +117,6 @@ export default async function LeaderSubmissionDetailPage({ params }: PageProps) 
           </CardContent>
         </Card>
       ) : null}
-    </AppShell>
+    </>
   );
 }

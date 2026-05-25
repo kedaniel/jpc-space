@@ -5,7 +5,6 @@ import { FileText } from "lucide-react";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole } from "@/lib/auth/permissions";
 import { listAssignmentsForStudent } from "@/lib/assignments-query";
-import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -21,7 +20,7 @@ export default async function StudentAssignmentsPage() {
   const rows = await listAssignmentsForStudent(user.userId, user.activeSeasonId);
 
   return (
-    <AppShell user={user} title="Assignments">
+    <>
       <PageHeader
         title="Assignments"
         description={`${rows.length} assignment${rows.length === 1 ? "" : "s"} in your current season`}
@@ -49,7 +48,7 @@ export default async function StudentAssignmentsPage() {
                       </Link>
                       {r.dueAt && (
                         <p className="text-sm text-muted-foreground">
-                          Due {format(r.dueAt, "MMM d, yyyy · h:mm a")}
+                          Due {format(r.dueAt, "MMM d, yyyy آ· h:mm a")}
                           {!past && ` (in ${formatDistanceToNowStrict(r.dueAt)})`}
                         </p>
                       )}
@@ -70,6 +69,6 @@ export default async function StudentAssignmentsPage() {
           })}
         </ul>
       )}
-    </AppShell>
+    </>
   );
 }

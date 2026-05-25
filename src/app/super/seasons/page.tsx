@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole } from "@/lib/auth/permissions";
-import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import {
   SeasonCreateButton,
@@ -42,7 +41,7 @@ export default async function SuperSeasonsPage() {
   }));
 
   return (
-    <AppShell user={user} title="Seasons">
+    <>
       <PageHeader
         title="Seasons"
         description="Create and manage program seasons."
@@ -53,6 +52,6 @@ export default async function SuperSeasonsPage() {
         basePath="/super/seasons"
         emptyAction={<SeasonCreateButton />}
       />
-    </AppShell>
+    </>
   );
 }

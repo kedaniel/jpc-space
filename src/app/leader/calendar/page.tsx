@@ -2,7 +2,6 @@ import { db } from "@/lib/db";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole } from "@/lib/auth/permissions";
 import { listSessionsForSeason } from "@/lib/sessions-query";
-import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { CalendarList } from "@/components/sessions/calendar-list";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -16,14 +15,14 @@ export default async function LeaderCalendarPage() {
 
   if (user.groupLeaderIds.length === 0) {
     return (
-      <AppShell user={user} title="Calendar">
+      <>
         <PageHeader title="Calendar" description="You don't lead any groups yet." />
         <EmptyState
           icon={Calendar}
           title="No calendar"
           description="An admin will add you to a group when you're ready."
         />
-      </AppShell>
+      </>
     );
   }
 
@@ -37,7 +36,7 @@ export default async function LeaderCalendarPage() {
   ).flat().sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime());
 
   return (
-    <AppShell user={user} title="Calendar">
+    <>
       <PageHeader
         title="Calendar"
         description={`${sessions.length} session${sessions.length === 1 ? "" : "s"}`}
@@ -47,6 +46,6 @@ export default async function LeaderCalendarPage() {
         basePath="/leader/sessions"
         showAttendanceLink
       />
-    </AppShell>
+    </>
   );
 }

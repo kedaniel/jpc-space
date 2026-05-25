@@ -8,7 +8,6 @@ import {
   listLeadersForPicker,
   listStudentsForPicker,
 } from "@/lib/groups-query";
-import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { GroupForm } from "@/components/groups/group-form";
@@ -32,7 +31,7 @@ export default async function NewGroupPage({ params }: PageProps) {
   ]);
 
   return (
-    <AppShell user={user} title={`${season.title} · New group`}>
+    <>
       <PageHeader
         title="New group"
         description={`Add a group to ${season.title}.`}
@@ -48,6 +47,6 @@ export default async function NewGroupPage({ params }: PageProps) {
           />
         </CardContent>
       </Card>
-    </AppShell>
+    </>
   );
 }

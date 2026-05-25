@@ -6,7 +6,6 @@ import { db } from "@/lib/db";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole } from "@/lib/auth/permissions";
 import { computeEngagementForStudent } from "@/lib/engagement";
-import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -92,7 +91,7 @@ export default async function MentorDashboard() {
   });
 
   return (
-    <AppShell user={user} title="Mentor dashboard">
+    <>
       <PageHeader
         title="Mentor dashboard"
         description="Cross-season pastoral view. You can read everything; writes are limited to your notes."
@@ -223,7 +222,7 @@ export default async function MentorDashboard() {
         <QuickLink href="/mentor/reports" label="Reports" />
         <QuickLink href="/mentor/settings" label="Settings" />
       </div>
-    </AppShell>
+    </>
   );
 }
 
@@ -231,7 +230,7 @@ function QuickLink({ href, label }: { href: string; label: string }) {
   return (
     <Link
       href={href}
-      className="rounded-lg border border-neutral-200 bg-white p-3 text-center text-sm font-medium text-foreground transition-colors hover:border-brand-teal-400 hover:bg-brand-teal-50"
+      className="rounded-lg border border-border bg-card p-3 text-center text-sm font-medium text-foreground transition-colors hover:border-brand-teal-400 hover:bg-brand-teal-50 dark:hover:bg-brand-teal-950/40"
     >
       {label}
     </Link>

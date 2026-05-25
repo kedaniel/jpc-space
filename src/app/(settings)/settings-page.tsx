@@ -1,6 +1,5 @@
 import { db } from "@/lib/db";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
-import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { SettingsForm } from "@/components/settings/settings-form";
 import type { NotificationPrefsInput } from "@/lib/settings-actions";
@@ -35,13 +34,13 @@ export async function SettingsPageBody() {
     : DEFAULT_PREFS;
 
   return (
-    <AppShell user={user} title="Settings">
+    <>
       <PageHeader title="Settings" description="Profile, password, and notification preferences." />
       <SettingsForm
         initialName={row?.name ?? ""}
         email={row?.email ?? ""}
         initialPrefs={prefs}
       />
-    </AppShell>
+    </>
   );
 }

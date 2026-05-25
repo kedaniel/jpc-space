@@ -4,7 +4,6 @@ import { redirect } from "next/navigation";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole, canEditSeason } from "@/lib/auth/permissions";
 import { loadSeasonByCode } from "@/lib/seasons-query";
-import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { SessionForm } from "@/components/sessions/session-form";
@@ -23,7 +22,7 @@ export default async function NewSessionPage({ params }: PageProps) {
   if (!canEditSeason(user, season.id)) redirect("/admin/season");
 
   return (
-    <AppShell user={user} title={`${season.title} · New session`}>
+    <>
       <PageHeader
         title="New session"
         description={`Add a session to ${season.title}.`}
@@ -37,6 +36,6 @@ export default async function NewSessionPage({ params }: PageProps) {
           />
         </CardContent>
       </Card>
-    </AppShell>
+    </>
   );
 }

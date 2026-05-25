@@ -1,4 +1,4 @@
-# Architectural decisions — JPC Portal
+# Architectural decisions — JPC Space
 
 This doc captures the non-obvious choices behind the schema and project setup. The README has the *what*; this has the *why*.
 

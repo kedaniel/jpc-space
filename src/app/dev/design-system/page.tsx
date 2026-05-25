@@ -24,11 +24,17 @@ import { SubmissionStatusBadge } from "@/components/ui/submission-status-badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { DesignSystemForm } from "./form";
+import {
+  ElevationDemo,
+  IdentityDemo,
+  MotionDemo,
+  ThemeDemo,
+} from "./identity-demo";
 import { ModalDemo } from "./modal-demo";
 import { palette, semanticSwatches } from "./swatches";
 
 export const metadata: Metadata = {
-  title: "Design System — JPC Portal",
+  title: "Design System — JPC Space",
 };
 
 const roles = ["super", "admin", "leader", "mentor", "student"] as const;
@@ -40,6 +46,22 @@ export default function DesignSystemPage() {
         title="Design System"
         description="Tokens, primitives, and patterns. Reference before building any new screen."
       />
+
+      <Section title="Identity" subtitle="Logo, wordmark, and brand mark sizes">
+        <IdentityDemo />
+      </Section>
+
+      <Section title="Theme" subtitle="Light + dark via next-themes — tokens swap automatically">
+        <ThemeDemo />
+      </Section>
+
+      <Section title="Motion" subtitle="framer-motion presets in src/lib/motion.ts">
+        <MotionDemo />
+      </Section>
+
+      <Section title="Elevation" subtitle="Three sanctioned shadow tokens">
+        <ElevationDemo />
+      </Section>
 
       <Section title="Palette" subtitle="Brand and semantic scales">
         <div className="flex flex-col gap-6">
@@ -87,20 +109,43 @@ export default function DesignSystemPage() {
         </div>
       </Section>
 
-      <Section title="Typography">
-        <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-semibold tracking-tight">Heading 1</h1>
-          <h2 className="text-2xl font-semibold tracking-tight">Heading 2</h2>
-          <h3 className="text-xl font-semibold">Heading 3</h3>
-          <h4 className="text-lg font-medium">Heading 4</h4>
-          <p className="text-base text-foreground">
-            Body text — the primary reading size for paragraphs.
+      <Section
+        title="Typography"
+        subtitle="Geist Sans for all UI and headings, Geist Mono for code, Fraunces reserved for the JPC Space wordmark"
+      >
+        <div className="flex flex-col gap-3">
+          <h1 className="text-4xl font-semibold tracking-tight">
+            The work between
+          </h1>
+          <h2 className="text-2xl font-semibold tracking-tight">
+            Heading 2 — Geist Sans
+          </h2>
+          <h3 className="text-xl font-semibold">Heading 3 — Geist Sans</h3>
+          <h4 className="text-lg font-medium">Heading 4 — Geist Sans</h4>
+          <p className="max-w-2xl text-base text-foreground">
+            Body text — the primary reading size for paragraphs. Geist&apos;s
+            stylistic alternates are on by default (
+            <code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
+              ss01
+            </code>
+            ,{" "}
+            <code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
+              ss03
+            </code>
+            ,{" "}
+            <code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
+              cv11
+            </code>
+            ).
           </p>
           <p className="text-sm text-muted-foreground">
             Small text — secondary metadata and descriptions.
           </p>
           <p className="text-xs text-muted-foreground">
             Caption — timestamps and overflow labels.
+          </p>
+          <p className="font-mono text-sm text-foreground">
+            const fontMono = &quot;Geist Mono&quot;;
           </p>
         </div>
       </Section>

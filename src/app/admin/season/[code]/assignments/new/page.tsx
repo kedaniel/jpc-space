@@ -5,7 +5,6 @@ import { db } from "@/lib/db";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole, canEditSeason } from "@/lib/auth/permissions";
 import { loadSeasonByCode } from "@/lib/seasons-query";
-import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { AssignmentForm } from "@/components/assignments/assignment-form";
@@ -37,7 +36,7 @@ export default async function NewAssignmentPage({ params }: PageProps) {
   ]);
 
   return (
-    <AppShell user={user} title={`${season.title} · New assignment`}>
+    <>
       <PageHeader title="New assignment" description={`Add to ${season.title}.`} />
       <Card>
         <CardContent className="pt-6">
@@ -50,6 +49,6 @@ export default async function NewAssignmentPage({ params }: PageProps) {
           />
         </CardContent>
       </Card>
-    </AppShell>
+    </>
   );
 }

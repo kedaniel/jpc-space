@@ -4,7 +4,6 @@ import { format } from "date-fns";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole, canMarkAttendance } from "@/lib/auth/permissions";
 import { loadAttendanceRoster, loadSessionById } from "@/lib/sessions-query";
-import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { AttendanceForm } from "@/components/sessions/attendance-form";
 
@@ -25,7 +24,7 @@ export default async function LeaderAttendancePage({ params }: PageProps) {
   const roster = await loadAttendanceRoster(session.id, user.groupLeaderIds);
 
   return (
-    <AppShell user={user} title={`Attendance · ${session.title}`}>
+    <>
       <PageHeader
         title={`Attendance — ${session.title}`}
         description={format(session.startsAt, "EEE, MMM d, yyyy · h:mm a")}
@@ -35,6 +34,6 @@ export default async function LeaderAttendancePage({ params }: PageProps) {
         roster={roster}
         returnHref="/leader/calendar"
       />
-    </AppShell>
+    </>
   );
 }

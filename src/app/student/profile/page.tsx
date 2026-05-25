@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole } from "@/lib/auth/permissions";
-import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { StudentForm } from "@/components/students/student-form";
@@ -35,7 +34,7 @@ export default async function StudentProfilePage() {
   if (!userRow || !userRow.studentProfile) redirect("/student/dashboard");
 
   return (
-    <AppShell user={user} title="My profile">
+    <>
       <PageHeader
         title="My profile"
         description="Update your contact details, academic info, and faith background."
@@ -63,6 +62,6 @@ export default async function StudentProfilePage() {
           />
         </CardContent>
       </Card>
-    </AppShell>
+    </>
   );
 }

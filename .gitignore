@@ -45,3 +45,13 @@ next-env.d.ts
 
 # local file storage (dev only)
 /uploads
+
+# npx skills (cross-tool agents convention — not used; Claude Code reads .claude/skills/)
+/.agents/
+/skills-lock.json
+
+# Claude Code — user-specific state (project-shared config lives in .claude/settings.json)
+/.claude/settings.local.json
+/.claude/cache/
+/.claude/local/
+/.claude/.session

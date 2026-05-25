@@ -4,7 +4,6 @@ import { redirect } from "next/navigation";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole, canEditSeason } from "@/lib/auth/permissions";
 import { loadSeasonByCode } from "@/lib/seasons-query";
-import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { SeasonDetail } from "@/components/seasons/season-detail";
 
@@ -26,7 +25,7 @@ export default async function AdminSeasonDetailPage({ params }: PageProps) {
   if (!canEditSeason(user, season.id)) redirect("/admin/season");
 
   return (
-    <AppShell user={user} title={season.title}>
+    <>
       <PageHeader title={season.title} description={`Code: ${season.code}`} />
       <SeasonDetail
         season={season}
@@ -34,6 +33,6 @@ export default async function AdminSeasonDetailPage({ params }: PageProps) {
         groupsHref={`/admin/season/${season.code}/groups`}
         calendarHref="/admin/calendar"
       />
-    </AppShell>
+    </>
   );
 }

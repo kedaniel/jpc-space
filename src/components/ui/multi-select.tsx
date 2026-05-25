@@ -86,7 +86,7 @@ export function MultiSelect({
                 tabIndex={-1}
                 aria-label={`Remove ${o.label}`}
                 onClick={(e) => clearOne(o.value, e)}
-                className="inline-flex size-4 cursor-pointer items-center justify-center rounded-sm hover:bg-neutral-200/60"
+                className="inline-flex size-4 cursor-pointer items-center justify-center rounded-sm hover:bg-muted"
               >
                 <X className="size-3" />
               </span>
