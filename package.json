@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
-    "postinstall": "prisma generate",
+    "postinstall": "prisma generate && cp node_modules/@tailwindcss/oxide-linux-x64-gnu/tailwindcss-oxide.linux-x64-gnu.node node_modules/@tailwindcss/oxide/ 2>/dev/null || true",
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",

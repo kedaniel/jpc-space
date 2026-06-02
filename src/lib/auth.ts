@@ -1,4 +1,5 @@
 import NextAuth from "next-auth";
+import { authConfig } from "@/lib/auth.config";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
@@ -75,10 +76,7 @@ const devSwitchProvider = Credentials({
 });
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  session: { strategy: "jwt" },
-  pages: {
-    signIn: "/login",
-  },
+  ...authConfig,
   providers: isDev ? [credentialsProvider, devSwitchProvider] : [credentialsProvider],
   callbacks: {
     async jwt({ token, user, trigger }) {
