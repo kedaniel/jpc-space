@@ -74,6 +74,8 @@ Pre-filled with defaults on new seasons. Saved via existing season update Server
 
 ### 2. Leader — session check-in screen
 
+**One QR per session, shared across all groups in the season.** A session belongs to a season and is attended by all groups. Any leader of any group in that season (plus admins and SUPER) can open check-in. All leaders display the same QR code. When a student scans, their group is resolved automatically via `GroupStudent`.
+
 **Location:** Leader session detail page (`/leader/sessions/[id]`). New "Check-in" section below session info.
 
 **States:**
@@ -88,11 +90,11 @@ Pre-filled with defaults on new seasons. Saved via existing season update Server
 
 **Download:** Exports the QR as a PNG using a canvas element, filename `session-[id]-checkin.png`.
 
-**Live attendance list:** Rendered below the QR while check-in is open. Students appear as they scan. Each row shows name, check-in time, computed status badge. Leader can tap any row to manually set status via a bottom sheet with 4 options (PRESENT / LATE / ABSENT / EXCUSED).
+**Live attendance list:** Rendered below the QR while check-in is open. Each leader sees only the students in their own group (scoped by `GroupStudent`). Students appear as they scan. Each row shows name, check-in time, computed status badge. Leader can tap any row to manually set status via a bottom sheet with 4 options (PRESENT / LATE / ABSENT / EXCUSED).
 
 **Server Actions (new):**
-- `openCheckIn(sessionId)` — sets `checkInOpenAt = now()`, clears `checkInClosedAt`
-- `closeCheckIn(sessionId)` — sets `checkInClosedAt = now()`
+- `openCheckIn(sessionId)` — sets `checkInOpenAt = now()`, clears `checkInClosedAt`. Any authorised leader of the season may call this.
+- `closeCheckIn(sessionId)` — sets `checkInClosedAt = now()`. Any authorised leader of the season may call this.
 
 ---
 
@@ -151,7 +153,7 @@ budgetRemaining = absenceBudgetMinutes - budgetUsed
 
 | Action | Who |
 |---|---|
-| Open / close check-in | LEADER of the group in this season, ADMIN of season, SUPER |
+| Open / close check-in | Any LEADER of any group in the session's season, ADMIN of season, SUPER |
 | QR scan / check-in write | STUDENT (authenticated, enrolled in the season) |
 | Manual attendance override | LEADER of the group, ADMIN of season, SUPER |
 | View absence budget | STUDENT (own only), LEADER of group, MENTOR, ADMIN, SUPER |
