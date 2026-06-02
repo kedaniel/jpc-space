@@ -195,6 +195,11 @@ model Season {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
+  lateThresholdMinutes  Int @default(15)
+  absenceBudgetMinutes  Int @default(180)
+  absenceWeightMinutes  Int @default(90)
+  lateWeightMinutes     Int @default(30)
+
   admins            SeasonAdmin[]
   groups            Group[]
   sessions          Session[]
@@ -300,6 +305,9 @@ model Session {
   materialsPath     String?
   // Sibling sessions created in the same recurrence batch share this id.
   recurrenceGroupId String?
+  checkInToken     String?   @unique
+  checkInOpenAt    DateTime?
+  checkInClosedAt  DateTime?
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 
@@ -321,6 +329,7 @@ model Attendance {
   markedById    Int?
   markedBy      User?            @relation("AttendanceMarkedBy", fields: [markedById], references: [id], onDelete: SetNull)
   markedAt      DateTime         @default(now())
+  checkedInAt   DateTime?
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt
 
