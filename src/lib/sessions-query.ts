@@ -53,6 +53,9 @@ export interface SessionDetailData {
   seasonId: number;
   seasonCode: string;
   seasonTitle: string;
+  checkInToken: string | null;
+  checkInOpenAt: Date | null;
+  checkInClosedAt: Date | null;
 }
 
 export async function loadSessionById(id: number): Promise<SessionDetailData> {
@@ -68,6 +71,9 @@ export async function loadSessionById(id: number): Promise<SessionDetailData> {
       recurrenceGroupId: true,
       seasonId: true,
       season: { select: { code: true, title: true } },
+      checkInToken: true,
+      checkInOpenAt: true,
+      checkInClosedAt: true,
     },
   });
   if (!s) notFound();
@@ -82,6 +88,9 @@ export async function loadSessionById(id: number): Promise<SessionDetailData> {
     seasonId: s.seasonId,
     seasonCode: s.season.code,
     seasonTitle: s.season.title,
+    checkInToken: s.checkInToken,
+    checkInOpenAt: s.checkInOpenAt,
+    checkInClosedAt: s.checkInClosedAt,
   };
 }
 
