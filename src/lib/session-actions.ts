@@ -7,7 +7,7 @@ import { nanoid } from "nanoid";
 
 import { db } from "@/lib/db";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
-import { isAdminOfSeason, isLeaderInSeason } from "@/lib/rbac";
+import { isAdminOfSeason } from "@/lib/rbac";
 import { ForbiddenError } from "@/lib/auth/errors";
 import { generateRecurringDates, siblingsInScope, type RecurrenceScope } from "@/lib/recurrence";
 import { createNotificationsBulk } from "@/lib/notifications";
@@ -226,7 +226,7 @@ export async function openCheckInAction(sessionId: number): Promise<ActionResult
   });
   if (!session) return { ok: false, error: "Session not found." };
 
-  if (!(await isLeaderInSeason(user, session.seasonId))) throw new ForbiddenError();
+  if (!isAdminOfSeason(user, session.seasonId)) throw new ForbiddenError();
 
   await db.session.update({
     where: { id: sessionId },
@@ -251,7 +251,7 @@ export async function closeCheckInAction(sessionId: number): Promise<ActionResul
   });
   if (!session) return { ok: false, error: "Session not found." };
 
-  if (!(await isLeaderInSeason(user, session.seasonId))) throw new ForbiddenError();
+  if (!isAdminOfSeason(user, session.seasonId)) throw new ForbiddenError();
 
   await db.session.update({
     where: { id: sessionId },
@@ -259,6 +259,26 @@ export async function closeCheckInAction(sessionId: number): Promise<ActionResul
   });
 
   revalidatePath(`/leader/sessions/${sessionId}`);
+  revalidatePath(`/admin/season`);
+  return { ok: true };
+}
+
+export async function regenerateCheckInTokenAction(sessionId: number): Promise<ActionResult> {
+  const user = await getCurrentUserOrRedirect();
+
+  const session = await db.session.findUnique({
+    where: { id: sessionId },
+    select: { seasonId: true },
+  });
+  if (!session) return { ok: false, error: "Session not found." };
+
+  if (!isAdminOfSeason(user, session.seasonId)) throw new ForbiddenError();
+
+  await db.session.update({
+    where: { id: sessionId },
+    data: { checkInToken: newPublicId() },
+  });
+
   revalidatePath(`/admin/season`);
   return { ok: true };
 }
