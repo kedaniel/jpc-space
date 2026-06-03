@@ -41,6 +41,8 @@ export default async function AdminCalendarPage({ params }: PageProps) {
         basePath={`/admin/season/${season.code}/sessions`}
         createHref={createHref}
         showAttendanceLink
+        showCheckIn
+        checkInBaseUrl={process.env.AUTH_URL!}
       />
     </>
   );

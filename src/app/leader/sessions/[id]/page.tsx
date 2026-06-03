@@ -29,10 +29,12 @@ export default async function LeaderSessionPage({ params }: PageProps) {
     notFound();
   }
 
+  // eslint-disable-next-line react-hooks/purity -- Server Component: Date.now() runs once per request
+  const now = Date.now();
   const checkInOpen =
     !!session.checkInOpenAt &&
     !session.checkInClosedAt &&
-    Date.now() - session.checkInOpenAt.getTime() < 3 * 60 * 60 * 1000;
+    now - session.checkInOpenAt.getTime() < 3 * 60 * 60 * 1000;
 
   const groupStudents = await db.groupStudent.findMany({
     where: {

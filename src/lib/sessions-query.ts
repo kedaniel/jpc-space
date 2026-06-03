@@ -12,6 +12,9 @@ export interface SessionListRow {
   attendanceMarked: boolean;
   seasonCode: string;
   seasonTitle: string;
+  checkInToken: string | null;
+  checkInOpenAt: Date | null;
+  checkInClosedAt: Date | null;
 }
 
 export async function listSessionsForSeason(seasonId: number): Promise<SessionListRow[]> {
@@ -25,6 +28,9 @@ export async function listSessionsForSeason(seasonId: number): Promise<SessionLi
       durationMinutes: true,
       location: true,
       recurrenceGroupId: true,
+      checkInToken: true,
+      checkInOpenAt: true,
+      checkInClosedAt: true,
       _count: { select: { attendance: true } },
       season: { select: { code: true, title: true } },
     },
@@ -39,6 +45,9 @@ export async function listSessionsForSeason(seasonId: number): Promise<SessionLi
     attendanceMarked: s._count.attendance > 0,
     seasonCode: s.season.code,
     seasonTitle: s.season.title,
+    checkInToken: s.checkInToken,
+    checkInOpenAt: s.checkInOpenAt,
+    checkInClosedAt: s.checkInClosedAt,
   }));
 }
 

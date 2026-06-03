@@ -42,10 +42,12 @@ export default async function SessionDetailPage({ params }: PageProps) {
   if (session.seasonId !== season.id) redirect(`/admin/season/${season.code}/calendar`);
 
   const CHECK_IN_DURATION_MS = 3 * 60 * 60 * 1000;
+  // eslint-disable-next-line react-hooks/purity -- Server Component: Date.now() runs once per request
+  const now = Date.now();
   const checkInOpen =
     !!session.checkInOpenAt &&
     !session.checkInClosedAt &&
-    Date.now() - session.checkInOpenAt.getTime() < CHECK_IN_DURATION_MS;
+    now - session.checkInOpenAt.getTime() < CHECK_IN_DURATION_MS;
   const checkInExpiresAt =
     session.checkInOpenAt && checkInOpen
       ? new Date(session.checkInOpenAt.getTime() + CHECK_IN_DURATION_MS)

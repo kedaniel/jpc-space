@@ -222,7 +222,7 @@ export async function openCheckInAction(sessionId: number): Promise<ActionResult
 
   const session = await db.session.findUnique({
     where: { id: sessionId },
-    select: { seasonId: true, checkInToken: true },
+    select: { seasonId: true, checkInToken: true, season: { select: { code: true } } },
   });
   if (!session) return { ok: false, error: "Session not found." };
 
@@ -239,6 +239,8 @@ export async function openCheckInAction(sessionId: number): Promise<ActionResult
 
   revalidatePath(`/leader/sessions/${sessionId}`);
   revalidatePath(`/admin/season`);
+  revalidatePath(`/admin/season/${session.season.code}/calendar`);
+  revalidatePath(`/admin/season/${session.season.code}/sessions/${sessionId}`);
   return { ok: true };
 }
 
@@ -247,7 +249,7 @@ export async function closeCheckInAction(sessionId: number): Promise<ActionResul
 
   const session = await db.session.findUnique({
     where: { id: sessionId },
-    select: { seasonId: true },
+    select: { seasonId: true, season: { select: { code: true } } },
   });
   if (!session) return { ok: false, error: "Session not found." };
 
@@ -260,6 +262,8 @@ export async function closeCheckInAction(sessionId: number): Promise<ActionResul
 
   revalidatePath(`/leader/sessions/${sessionId}`);
   revalidatePath(`/admin/season`);
+  revalidatePath(`/admin/season/${session.season.code}/calendar`);
+  revalidatePath(`/admin/season/${session.season.code}/sessions/${sessionId}`);
   return { ok: true };
 }
 
@@ -268,7 +272,7 @@ export async function regenerateCheckInTokenAction(sessionId: number): Promise<A
 
   const session = await db.session.findUnique({
     where: { id: sessionId },
-    select: { seasonId: true },
+    select: { seasonId: true, season: { select: { code: true } } },
   });
   if (!session) return { ok: false, error: "Session not found." };
 
@@ -280,5 +284,7 @@ export async function regenerateCheckInTokenAction(sessionId: number): Promise<A
   });
 
   revalidatePath(`/admin/season`);
+  revalidatePath(`/admin/season/${session.season.code}/calendar`);
+  revalidatePath(`/admin/season/${session.season.code}/sessions/${sessionId}`);
   return { ok: true };
 }
