@@ -97,3 +97,60 @@ export async function computeEngagementBulk(
   }
   return out;
 }
+
+export interface AttendanceBudget {
+  minutesUsed: number;
+  budgetMinutes: number;
+  budgetPct: number;
+  absentCount: number;
+  lateCount: number;
+}
+
+export async function computeAttendanceBudget(
+  studentUserId: number,
+  seasonId: number,
+): Promise<AttendanceBudget | null> {
+  const season = await db.season.findUnique({
+    where: { id: seasonId },
+    select: {
+      absenceBudgetMinutes: true,
+      absenceWeightMinutes: true,
+      lateWeightMinutes: true,
+    },
+  });
+  if (!season) return null;
+
+  const [absentCount, lateCount] = await Promise.all([
+    db.attendance.count({
+      where: {
+        studentUserId,
+        status: "ABSENT",
+        session: { seasonId },
+      },
+    }),
+    db.attendance.count({
+      where: {
+        studentUserId,
+        status: "LATE",
+        session: { seasonId },
+      },
+    }),
+  ]);
+
+  const minutesUsed =
+    absentCount * season.absenceWeightMinutes +
+    lateCount * season.lateWeightMinutes;
+
+  const budgetPct = Math.min(
+    Math.round((minutesUsed / season.absenceBudgetMinutes) * 100),
+    100,
+  );
+
+  return {
+    minutesUsed,
+    budgetMinutes: season.absenceBudgetMinutes,
+    budgetPct,
+    absentCount,
+    lateCount,
+  };
+}

@@ -11,6 +11,7 @@ import { isAdminOfSeason } from "@/lib/rbac";
 import { ForbiddenError } from "@/lib/auth/errors";
 import { generateRecurringDates, siblingsInScope, type RecurrenceScope } from "@/lib/recurrence";
 import { createNotificationsBulk } from "@/lib/notifications";
+import { newPublicId } from "@/lib/public-id";
 
 export type ActionResult =
   | { ok: true }
@@ -214,4 +215,76 @@ function zodErrors(err: z.ZodError): { ok: false; error: string; fieldErrors: Re
     if (!fieldErrors[key]) fieldErrors[key] = issue.message;
   }
   return { ok: false, error: "Please fix the highlighted fields.", fieldErrors };
+}
+
+export async function openCheckInAction(sessionId: number): Promise<ActionResult> {
+  const user = await getCurrentUserOrRedirect();
+
+  const session = await db.session.findUnique({
+    where: { id: sessionId },
+    select: { seasonId: true, checkInToken: true, season: { select: { code: true } } },
+  });
+  if (!session) return { ok: false, error: "Session not found." };
+
+  if (!isAdminOfSeason(user, session.seasonId)) throw new ForbiddenError();
+
+  await db.session.update({
+    where: { id: sessionId },
+    data: {
+      checkInToken: session.checkInToken ?? newPublicId(),
+      checkInOpenAt: new Date(),
+      checkInClosedAt: null,
+    },
+  });
+
+  revalidatePath(`/leader/sessions/${sessionId}`);
+  revalidatePath(`/admin/season`);
+  revalidatePath(`/admin/season/${session.season.code}/calendar`);
+  revalidatePath(`/admin/season/${session.season.code}/sessions/${sessionId}`);
+  return { ok: true };
+}
+
+export async function closeCheckInAction(sessionId: number): Promise<ActionResult> {
+  const user = await getCurrentUserOrRedirect();
+
+  const session = await db.session.findUnique({
+    where: { id: sessionId },
+    select: { seasonId: true, season: { select: { code: true } } },
+  });
+  if (!session) return { ok: false, error: "Session not found." };
+
+  if (!isAdminOfSeason(user, session.seasonId)) throw new ForbiddenError();
+
+  await db.session.update({
+    where: { id: sessionId },
+    data: { checkInClosedAt: new Date() },
+  });
+
+  revalidatePath(`/leader/sessions/${sessionId}`);
+  revalidatePath(`/admin/season`);
+  revalidatePath(`/admin/season/${session.season.code}/calendar`);
+  revalidatePath(`/admin/season/${session.season.code}/sessions/${sessionId}`);
+  return { ok: true };
+}
+
+export async function regenerateCheckInTokenAction(sessionId: number): Promise<ActionResult> {
+  const user = await getCurrentUserOrRedirect();
+
+  const session = await db.session.findUnique({
+    where: { id: sessionId },
+    select: { seasonId: true, season: { select: { code: true } } },
+  });
+  if (!session) return { ok: false, error: "Session not found." };
+
+  if (!isAdminOfSeason(user, session.seasonId)) throw new ForbiddenError();
+
+  await db.session.update({
+    where: { id: sessionId },
+    data: { checkInToken: newPublicId() },
+  });
+
+  revalidatePath(`/admin/season`);
+  revalidatePath(`/admin/season/${session.season.code}/calendar`);
+  revalidatePath(`/admin/season/${session.season.code}/sessions/${sessionId}`);
+  return { ok: true };
 }

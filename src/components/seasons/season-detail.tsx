@@ -3,11 +3,13 @@ import { format } from "date-fns";
 import { Calendar as CalendarIcon, Pencil, Users } from "lucide-react";
 
 import type { SeasonStatus } from "@/generated/prisma/enums";
+import type { SessionListRow } from "@/lib/sessions-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EmptyState } from "@/components/ui/empty-state";
 import { SeasonStatusBadge } from "@/components/seasons/season-status-badge";
+import { CalendarList } from "@/components/sessions/calendar-list";
 
 export interface SeasonDetailGroup {
   id: number;
@@ -35,6 +37,9 @@ interface SeasonDetailProps {
   editHref?: string;
   groupsHref: string;
   calendarHref: string;
+  sessions?: SessionListRow[];
+  checkInBaseUrl?: string;
+  sessionBasePath?: string;
 }
 
 export function SeasonDetail({
@@ -43,6 +48,9 @@ export function SeasonDetail({
   editHref,
   groupsHref,
   calendarHref,
+  sessions,
+  checkInBaseUrl,
+  sessionBasePath,
 }: SeasonDetailProps) {
   return (
     <Tabs defaultValue="overview">
@@ -142,14 +150,24 @@ export function SeasonDetail({
       </TabsContent>
 
       <TabsContent value="sessions">
-        <EmptyState
-          icon={CalendarIcon}
-          title={`${season.sessionCount} sessions scheduled`}
-          description="View and manage sessions on the calendar."
-          action={
-            <Button render={<Link href={calendarHref} />}>Open calendar</Button>
-          }
-        />
+        {sessions && sessionBasePath ? (
+          <CalendarList
+            sessions={sessions}
+            basePath={sessionBasePath}
+            showAttendanceLink
+            showCheckIn={!!checkInBaseUrl}
+            checkInBaseUrl={checkInBaseUrl}
+          />
+        ) : (
+          <EmptyState
+            icon={CalendarIcon}
+            title={`${season.sessionCount} sessions scheduled`}
+            description="View and manage sessions on the calendar."
+            action={
+              <Button render={<Link href={calendarHref} />}>Open calendar</Button>
+            }
+          />
+        )}
       </TabsContent>
     </Tabs>
   );

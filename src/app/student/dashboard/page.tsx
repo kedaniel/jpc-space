@@ -5,7 +5,7 @@ import { Calendar, FileText, Sparkles, User } from "lucide-react";
 import { db } from "@/lib/db";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole } from "@/lib/auth/permissions";
-import { computeEngagementForStudent } from "@/lib/engagement";
+import { computeEngagementForStudent, computeAttendanceBudget } from "@/lib/engagement";
 import { listAssignmentsForStudent } from "@/lib/assignments-query";
 import { PageHeader } from "@/components/layout/page-header";
 import { StaggerReveal } from "@/components/motion/stagger-reveal";
@@ -39,7 +39,7 @@ export default async function StudentDashboard() {
   const seasonId = user.activeSeasonId;
   const season = profile?.studentProfile?.activeSeason ?? null;
 
-  const [engagement, nextSession, assignments, recentFeedback] = seasonId
+  const [engagement, nextSession, assignments, recentFeedback, budget] = seasonId
     ? await Promise.all([
         computeEngagementForStudent(user.userId, seasonId),
         db.session.findFirst({
@@ -65,8 +65,9 @@ export default async function StudentDashboard() {
             assignment: { select: { id: true, title: true } },
           },
         }),
+        computeAttendanceBudget(user.userId, seasonId),
       ])
-    : [null, null, [], []];
+    : [null, null, [], [], null];
 
   const pending = assignments.filter(
     (a) => a.status === "PENDING" || a.status === "DRAFT",
@@ -108,12 +109,39 @@ export default async function StudentDashboard() {
                 <CardTitle className="text-base">Your progress</CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col gap-3">
-                <div className="flex items-center gap-3">
-                  <Progress value={engagement.attendancePct} className="flex-1" />
-                  <span className="text-sm font-semibold tabular-nums">
-                    {engagement.attendancePct}% attendance
-                  </span>
-                </div>
+                {budget && (
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-3">
+                      <Progress
+                        value={budget.budgetPct}
+                        className={[
+                          "flex-1",
+                          budget.budgetPct >= 80
+                            ? "[&>div]:bg-error-500"
+                            : budget.budgetPct >= 50
+                              ? "[&>div]:bg-warning-500"
+                              : "",
+                        ].join(" ")}
+                      />
+                      <span
+                        className={[
+                          "text-sm font-semibold tabular-nums",
+                          budget.budgetPct >= 80
+                            ? "text-error-700 dark:text-error-400"
+                            : budget.budgetPct >= 50
+                              ? "text-warning-700 dark:text-warning-400"
+                              : "text-muted-foreground",
+                        ].join(" ")}
+                      >
+                        {budget.minutesUsed}/{budget.budgetMinutes} min
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Absence budget used ({budget.absentCount} absent,{" "}
+                      {budget.lateCount} late)
+                    </p>
+                  </div>
+                )}
                 <p className="text-xs text-muted-foreground">
                   Week {weeksCompleted} of {weeksTotal} آ·{" "}
                   {engagement.submissionsCompleted}/{engagement.submissionsExpected}{" "}

@@ -41,6 +41,10 @@ const schema = z
       SeasonStatus.COMPLETED,
       SeasonStatus.ARCHIVED,
     ]),
+    lateThresholdMinutes: z.number().int().min(1).max(120),
+    absenceBudgetMinutes: z.number().int().min(1),
+    absenceWeightMinutes: z.number().int().min(1),
+    lateWeightMinutes: z.number().int().min(1),
   })
   .refine((v) => v.endDate.getTime() >= v.startDate.getTime(), {
     message: "End must be on or after start.",
@@ -83,6 +87,10 @@ export function SeasonForm({ mode, seasonId, defaultValues }: SeasonFormProps) {
       startDate: defaultValues?.startDate,
       endDate: defaultValues?.endDate,
       status: defaultValues?.status ?? SeasonStatus.DRAFT,
+      lateThresholdMinutes: defaultValues?.lateThresholdMinutes ?? 15,
+      absenceBudgetMinutes: defaultValues?.absenceBudgetMinutes ?? 180,
+      absenceWeightMinutes: defaultValues?.absenceWeightMinutes ?? 90,
+      lateWeightMinutes: defaultValues?.lateWeightMinutes ?? 30,
     },
   });
 
@@ -107,6 +115,10 @@ export function SeasonForm({ mode, seasonId, defaultValues }: SeasonFormProps) {
         startDate: values.startDate,
         endDate: values.endDate,
         status: values.status,
+        lateThresholdMinutes: values.lateThresholdMinutes,
+        absenceBudgetMinutes: values.absenceBudgetMinutes,
+        absenceWeightMinutes: values.absenceWeightMinutes,
+        lateWeightMinutes: values.lateWeightMinutes,
       };
       const result =
         mode === "create"
@@ -203,6 +215,57 @@ export function SeasonForm({ mode, seasonId, defaultValues }: SeasonFormProps) {
             )}
           />
         </FormField>
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <h3 className="text-sm font-semibold text-foreground">Attendance rules</h3>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <FormField
+            label="Late threshold (minutes)"
+            description="Minutes after session start before a student is marked LATE."
+            error={errors.lateThresholdMinutes?.message}
+          >
+            <Input
+              type="number"
+              min={1}
+              max={120}
+              {...register("lateThresholdMinutes", { valueAsNumber: true })}
+            />
+          </FormField>
+          <FormField
+            label="Absence budget (minutes)"
+            description="Total minutes a student may miss before being flagged."
+            error={errors.absenceBudgetMinutes?.message}
+          >
+            <Input
+              type="number"
+              min={1}
+              {...register("absenceBudgetMinutes", { valueAsNumber: true })}
+            />
+          </FormField>
+          <FormField
+            label="Absence weight (minutes)"
+            description="How many budget minutes one ABSENT consumes."
+            error={errors.absenceWeightMinutes?.message}
+          >
+            <Input
+              type="number"
+              min={1}
+              {...register("absenceWeightMinutes", { valueAsNumber: true })}
+            />
+          </FormField>
+          <FormField
+            label="Late weight (minutes)"
+            description="How many budget minutes one LATE arrival consumes."
+            error={errors.lateWeightMinutes?.message}
+          >
+            <Input
+              type="number"
+              min={1}
+              {...register("lateWeightMinutes", { valueAsNumber: true })}
+            />
+          </FormField>
+        </div>
       </div>
 
       {submitError ? (
