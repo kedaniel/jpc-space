@@ -44,7 +44,7 @@ export default async function AdminCalendarPage({ params }: PageProps) {
       <SeasonCalendar
         sessions={sessions}
         jpcEvents={jpcEvents}
-        getSessionHref={(id) => `/admin/season/${season.code}/sessions/${id}`}
+        sessionPathTemplate="/admin/season/{seasonCode}/sessions/{id}"
       />
     </>
   );

@@ -40,7 +40,7 @@ export default async function StudentCalendarPage() {
       <SeasonCalendar
         sessions={sessions}
         jpcEvents={jpcEvents}
-        getSessionHref={(id) => `/student/sessions/${id}`}
+        sessionPathTemplate="/student/sessions/{id}"
       />
     </>
   );

@@ -49,7 +49,7 @@ export default async function LeaderCalendarPage() {
       <SeasonCalendar
         sessions={allSessions}
         jpcEvents={jpcEvents}
-        getSessionHref={(id) => `/leader/sessions/${id}`}
+        sessionPathTemplate="/leader/sessions/{id}"
       />
     </>
   );

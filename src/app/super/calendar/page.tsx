@@ -31,10 +31,7 @@ export default async function SuperCalendarPage() {
       <SeasonCalendar
         sessions={sessions}
         jpcEvents={jpcEvents}
-        getSessionHref={(id) => {
-          const s = sessions.find((x) => x.id === id);
-          return s ? `/admin/season/${s.seasonCode}/sessions/${id}` : "#";
-        }}
+        sessionPathTemplate="/admin/season/{seasonCode}/sessions/{id}"
         seasonColors={seasonColors}
       />
     </>

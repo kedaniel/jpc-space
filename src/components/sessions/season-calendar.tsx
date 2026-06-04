@@ -40,8 +40,16 @@ function sessionCellClass(s: SessionListRow, seasonColors?: Record<string, strin
 interface SeasonCalendarProps {
   sessions: SessionListRow[];
   jpcEvents: JpcEventRow[];
-  getSessionHref: (id: number) => string;
+  /** URL template — use `{id}` and `{seasonCode}` as placeholders.
+   *  e.g. "/student/sessions/{id}" or "/admin/season/{seasonCode}/sessions/{id}" */
+  sessionPathTemplate: string;
   seasonColors?: Record<string, string>;
+}
+
+function buildSessionHref(template: string, s: SessionListRow): string {
+  return template
+    .replace("{id}", String(s.id))
+    .replace("{seasonCode}", s.seasonCode);
 }
 
 const DOW = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -49,7 +57,7 @@ const DOW = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 export function SeasonCalendar({
   sessions,
   jpcEvents,
-  getSessionHref,
+  sessionPathTemplate,
   seasonColors,
 }: SeasonCalendarProps) {
   const [current, setCurrent] = React.useState<Date>(() => {
@@ -158,7 +166,7 @@ export function SeasonCalendar({
               {daySessions.map((s) => (
                 <Link
                   key={s.id}
-                  href={getSessionHref(s.id)}
+                  href={buildSessionHref(sessionPathTemplate, s)}
                   className={`block rounded px-1 py-0.5 truncate font-medium leading-tight
                     ${sessionCellClass(s, seasonColors)}`}
                   title={s.title}
