@@ -109,12 +109,6 @@ export default async function StudentDashboard() {
                 <CardTitle className="text-base">Your progress</CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col gap-3">
-                <div className="flex items-center gap-3">
-                  <Progress value={engagement.attendancePct} className="flex-1" />
-                  <span className="text-sm font-semibold tabular-nums">
-                    {engagement.attendancePct}% attendance
-                  </span>
-                </div>
                 {budget && (
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-3">
