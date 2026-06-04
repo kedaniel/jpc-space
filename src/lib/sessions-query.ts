@@ -10,6 +10,7 @@ export interface SessionListRow {
   location: string | null;
   recurrenceGroupId: string | null;
   attendanceMarked: boolean;
+  seasonId: number;
   seasonCode: string;
   seasonTitle: string;
   checkInToken: string | null;
@@ -32,7 +33,7 @@ export async function listSessionsForSeason(seasonId: number): Promise<SessionLi
       checkInOpenAt: true,
       checkInClosedAt: true,
       _count: { select: { attendance: true } },
-      season: { select: { code: true, title: true } },
+      season: { select: { id: true, code: true, title: true } },
     },
   });
   return rows.map((s) => ({
@@ -43,6 +44,36 @@ export async function listSessionsForSeason(seasonId: number): Promise<SessionLi
     location: s.location,
     recurrenceGroupId: s.recurrenceGroupId,
     attendanceMarked: s._count.attendance > 0,
+    seasonId: s.season.id,
+    seasonCode: s.season.code,
+    seasonTitle: s.season.title,
+  }));
+}
+
+export async function listSessionsForAllActiveSeasons(): Promise<SessionListRow[]> {
+  const rows = await db.session.findMany({
+    where: { season: { status: "ACTIVE", deletedAt: null } },
+    orderBy: { startsAt: "asc" },
+    select: {
+      id: true,
+      title: true,
+      startsAt: true,
+      durationMinutes: true,
+      location: true,
+      recurrenceGroupId: true,
+      _count: { select: { attendance: true } },
+      season: { select: { id: true, code: true, title: true } },
+    },
+  });
+  return rows.map((s) => ({
+    id: s.id,
+    title: s.title,
+    startsAt: s.startsAt,
+    durationMinutes: s.durationMinutes,
+    location: s.location,
+    recurrenceGroupId: s.recurrenceGroupId,
+    attendanceMarked: s._count.attendance > 0,
+    seasonId: s.season.id,
     seasonCode: s.season.code,
     seasonTitle: s.season.title,
     checkInToken: s.checkInToken,
