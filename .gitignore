@@ -55,3 +55,6 @@ next-env.d.ts
 /.claude/cache/
 /.claude/local/
 /.claude/.session
+
+# Brainstorming companion artifacts
+.superpowers/
