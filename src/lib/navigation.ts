@@ -6,6 +6,7 @@ export type NavIconName =
   | "dashboard"
   | "users"
   | "calendar"
+  | "events"
   | "assignments"
   | "submissions"
   | "history"
@@ -33,6 +34,8 @@ const SUPER: RoleNav = {
   sidebar: [
     { href: "/super/dashboard", label: "Dashboard", icon: "dashboard" },
     { href: "/super/seasons", label: "Seasons", icon: "season" },
+    { href: "/super/calendar", label: "Calendar", icon: "calendar" },
+    { href: "/super/events", label: "JPC Events", icon: "events" },
     { href: "/super/students", label: "Students", icon: "students" },
     { href: "/super/users", label: "Users", icon: "users" },
     { href: "/super/reports", label: "Reports", icon: "reports" },
@@ -41,8 +44,8 @@ const SUPER: RoleNav = {
   tabs: [
     { href: "/super/dashboard", label: "Home", icon: "home" },
     { href: "/super/seasons", label: "Seasons", icon: "season" },
+    { href: "/super/calendar", label: "Calendar", icon: "calendar" },
     { href: "/super/students", label: "Students", icon: "students" },
-    { href: "/super/users", label: "Users", icon: "users" },
     { href: "/super/more", label: "More", icon: "more" },
   ],
 };

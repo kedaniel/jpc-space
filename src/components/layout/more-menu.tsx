@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ChevronRight, LogOut } from "lucide-react";
 import {
   Calendar,
+  CalendarDays,
   ClipboardList,
   FileText,
   Folders,
@@ -29,6 +30,7 @@ const iconMap: Record<NavIconName, LucideIcon> = {
   dashboard: LayoutDashboard,
   users: Users,
   calendar: Calendar,
+  events: CalendarDays,
   assignments: ClipboardList,
   submissions: FileText,
   history: FileText,

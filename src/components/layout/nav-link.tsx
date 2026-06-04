@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   Calendar,
+  CalendarDays,
   ClipboardList,
   FileText,
   Folders,
@@ -30,6 +31,7 @@ const iconMap: Record<NavIconName, LucideIcon> = {
   dashboard: LayoutDashboard,
   users: Users,
   calendar: Calendar,
+  events: CalendarDays,
   assignments: ClipboardList,
   submissions: FileText,
   history: History,
