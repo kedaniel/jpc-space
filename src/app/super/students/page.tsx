@@ -24,7 +24,7 @@ export default async function SuperStudentsPage({
   const rowsWithAvatars = await Promise.all(
     rows.map(async (r) => ({
       ...r,
-      avatarUrl: r.photoPath ? await storage.url(r.photoPath) : null,
+      avatarUrl: r.avatarPath ? await storage.url(r.avatarPath) : null,
     })),
   );
 

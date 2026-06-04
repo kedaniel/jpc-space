@@ -12,6 +12,7 @@ export interface StudentListRow {
   university: string | null;
   year: string | null;
   photoPath: string | null;
+  avatarPath: string | null;
   avatarUrl?: string | null;
   activeSeasonTitle: string | null;
   groupName: string | null;
@@ -66,6 +67,7 @@ export async function listStudentsForScope(
       id: true,
       name: true,
       email: true,
+      avatarPath: true,
       studentProfile: {
         select: {
           university: true,
@@ -84,6 +86,7 @@ export async function listStudentsForScope(
     id: u.id,
     name: u.name,
     email: u.email,
+    avatarPath: u.avatarPath,
     university: u.studentProfile?.university ?? null,
     year: u.studentProfile?.year ?? null,
     photoPath: u.studentProfile?.photoPath ?? null,
