@@ -20,7 +20,7 @@ export default async function StudentHistoryPage() {
   const user = await getCurrentUserOrRedirect();
   requireRole(user, ["STUDENT"]);
 
-  // Past enrollments only â€” exclude the student's current active season.
+  // Past enrollments only — exclude the student's current active season.
   const enrollments = await db.seasonEnrollment.findMany({
     where: {
       studentUserId: user.userId,
@@ -60,7 +60,7 @@ export default async function StudentHistoryPage() {
     );
   }
 
-  // Compute attendance % per past season â€” NO submission data fetched here.
+  // Compute attendance % per past season — NO submission data fetched here.
   const seasonIds = enrollments.map((e) => e.seasonId);
   const attendanceByseason = new Map<number, { total: number; present: number }>();
   for (const sid of seasonIds) {
@@ -105,9 +105,9 @@ export default async function StudentHistoryPage() {
                     <div>
                       <CardTitle className="text-base">{e.season.title}</CardTitle>
                       <p className="text-xs text-muted-foreground">
-                        {format(e.season.startDate, "MMM d, yyyy")} â€“{" "}
+                        {format(e.season.startDate, "MMM d, yyyy")} –{" "}
                         {format(e.season.endDate, "MMM d, yyyy")}
-                        {e.group?.name && ` آ· ${e.group.name}`}
+                        {e.group?.name && ` · ${e.group.name}`}
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-1.5">

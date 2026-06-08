@@ -143,7 +143,7 @@ export default async function StudentDashboard() {
                   </div>
                 )}
                 <p className="text-xs text-muted-foreground">
-                  Week {weeksCompleted} of {weeksTotal} آ·{" "}
+                  Week {weeksCompleted} of {weeksTotal} ·{" "}
                   {engagement.submissionsCompleted}/{engagement.submissionsExpected}{" "}
                   assignments submitted
                 </p>
@@ -163,9 +163,9 @@ export default async function StudentDashboard() {
                 <div className="flex flex-col gap-1">
                   <p className="font-medium">{nextSession.title}</p>
                   <p className="text-sm text-muted-foreground">
-                    {format(nextSession.startsAt, "EEE, MMM d آ· h:mm a")} آ·{" "}
+                    {format(nextSession.startsAt, "EEE, MMM d · h:mm a")} ·{" "}
                     {nextSession.durationMinutes} min
-                    {nextSession.location ? ` آ· ${nextSession.location}` : ""}
+                    {nextSession.location ? ` · ${nextSession.location}` : ""}
                   </p>
                   <p className="text-xs text-info-700">
                     Starts {formatDistanceToNowStrict(nextSession.startsAt, { addSuffix: true })}
@@ -189,7 +189,7 @@ export default async function StudentDashboard() {
             <CardContent>
               {pending.length === 0 ? (
                 <p className="text-sm italic text-muted-foreground">
-                  Nothing pending â€” great job staying on top of it.
+                  Nothing pending — great job staying on top of it.
                 </p>
               ) : (
                 <ul className="flex flex-col divide-y divide-border">

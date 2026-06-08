@@ -37,13 +37,20 @@ function UserMenu({ role, userId, initials, avatarUrl, signOutAction }: UserMenu
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) return;
+    if (file.size > 5 * 1024 * 1024) return;
+    const objectUrl = URL.createObjectURL(file);
     setUploading(true);
-    setPreview(URL.createObjectURL(file));
+    setPreview(objectUrl);
     const fd = new FormData();
     fd.append("avatar", file);
-    await updateAvatarAction(fd);
+    const result = await updateAvatarAction(fd);
     setUploading(false);
-    router.refresh();
+    if (result && "error" in result) {
+      setPreview(avatarUrl ?? null);
+    } else {
+      router.refresh();
+    }
   }
 
   return (
