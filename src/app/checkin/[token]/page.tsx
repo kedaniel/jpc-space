@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { CheckCircle, Clock, XCircle } from "lucide-react";
 
@@ -34,12 +35,12 @@ export default async function CheckInPage({ params }: PageProps) {
             {result.minutesLate} minute{result.minutesLate === 1 ? "" : "s"} after session start.
           </p>
         )}
-        <a
+        <Link
           href="/student/dashboard"
           className="mt-2 text-sm text-brand-teal-600 underline-offset-4 hover:underline dark:text-brand-teal-400"
         >
           Go to dashboard
-        </a>
+        </Link>
       </main>
     );
   }
@@ -65,12 +66,12 @@ export default async function CheckInPage({ params }: PageProps) {
         {result.error === "already_checked_in" ? "Already checked in" : "Can't check in"}
       </h1>
       <p className="text-muted-foreground">{messages[result.error]}</p>
-      <a
+      <Link
         href="/student/dashboard"
         className="mt-2 text-sm text-brand-teal-600 underline-offset-4 hover:underline dark:text-brand-teal-400"
       >
         Go to dashboard
-      </a>
+      </Link>
     </main>
   );
 }

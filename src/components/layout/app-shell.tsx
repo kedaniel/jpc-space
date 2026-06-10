@@ -2,6 +2,7 @@ import * as React from "react";
 
 import { signOut } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { getStorage } from "@/lib/storage";
 import { navFor } from "@/lib/navigation";
 import type { SessionUser } from "@/lib/rbac";
 import { TopBar } from "@/components/layout/top-bar";
@@ -42,7 +43,7 @@ interface AppShellProps {
 async function AppShell({ user, children }: AppShellProps) {
   const nav = navFor(user);
   const isDev = process.env.DEV_USER_SWITCHER === "1";
-  const [notifications, unread, devUsers] = await Promise.all([
+  const [notifications, unread, devUsers, currentUser] = await Promise.all([
     listRecent(user.userId, 8),
     unreadCount(user.userId),
     isDev
@@ -52,7 +53,13 @@ async function AppShell({ user, children }: AppShellProps) {
           orderBy: [{ role: "asc" }, { email: "asc" }],
         })
       : Promise.resolve([]),
+    db.user.findUnique({ where: { id: user.userId }, select: { avatarPath: true } }),
   ]);
+
+  const storage = getStorage();
+  const avatarUrl = currentUser?.avatarPath
+    ? await storage.url(currentUser.avatarPath)
+    : null;
 
   return (
     <ShellFrame
@@ -63,6 +70,7 @@ async function AppShell({ user, children }: AppShellProps) {
           role={user.role}
           userId={user.userId}
           initials={initialsFor(user)}
+          avatarUrl={avatarUrl}
           signOutAction={signOutAction}
           notifications={notifications}
           unreadCount={unread}

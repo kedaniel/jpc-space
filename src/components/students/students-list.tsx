@@ -3,7 +3,7 @@ import { Users } from "lucide-react";
 
 import { DataTable, type DataTableColumn } from "@/components/ui/data-table";
 import { EmptyState } from "@/components/ui/empty-state";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import type { StudentListRow } from "@/lib/students-query";
 
@@ -40,6 +40,7 @@ export function StudentsList({
           className="inline-flex items-center gap-2 hover:underline"
         >
           <Avatar className="size-8">
+            {row.avatarUrl && <AvatarImage src={row.avatarUrl} alt={row.name ?? row.email} />}
             <AvatarFallback>{initialsFor(row.name, row.email)}</AvatarFallback>
           </Avatar>
           <span className="flex flex-col">

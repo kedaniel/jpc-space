@@ -3,11 +3,21 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole } from "@/lib/auth/permissions";
+import { getStorage } from "@/lib/storage";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { StudentForm } from "@/components/students/student-form";
+import { AvatarUpload } from "@/components/students/avatar-upload";
 
 export const metadata = { title: "My profile" };
+
+function initialsFor(name: string | null, email: string): string {
+  if (name?.trim()) {
+    const parts = name.trim().split(/\s+/);
+    return ((parts[0]?.[0] ?? "") + (parts[1]?.[0] ?? "")).toUpperCase() || "?";
+  }
+  return email[0]?.toUpperCase() ?? "?";
+}
 
 export default async function StudentProfilePage() {
   const user = await getCurrentUserOrRedirect();
@@ -18,6 +28,7 @@ export default async function StudentProfilePage() {
     select: {
       name: true,
       email: true,
+      avatarPath: true,
       studentProfile: {
         select: {
           university: true,
@@ -33,6 +44,10 @@ export default async function StudentProfilePage() {
   });
   if (!userRow || !userRow.studentProfile) redirect("/student/dashboard");
 
+  const storage = getStorage();
+  const avatarUrl = userRow.avatarPath ? await storage.url(userRow.avatarPath) : null;
+  const initials = initialsFor(userRow.name, userRow.email);
+
   return (
     <>
       <PageHeader
@@ -40,7 +55,10 @@ export default async function StudentProfilePage() {
         description="Update your contact details, academic info, and faith background."
       />
       <Card>
-        <CardContent className="pt-6">
+        <CardContent className="pt-6 flex flex-col gap-6">
+          <div className="flex justify-center">
+            <AvatarUpload currentAvatarUrl={avatarUrl} initials={initials} />
+          </div>
           <StudentForm
             mode="edit"
             studentUserId={user.userId}

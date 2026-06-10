@@ -80,7 +80,7 @@ export default async function StudentSeasonPage() {
     <>
       <PageHeader
         title={season.title}
-        description={`${format(season.startDate, "MMM d, yyyy")} â€“ ${format(season.endDate, "MMM d, yyyy")}`}
+        description={`${format(season.startDate, "MMM d, yyyy")} – ${format(season.endDate, "MMM d, yyyy")}`}
       />
 
       <div className="mb-4 flex flex-wrap gap-2">
@@ -124,7 +124,7 @@ export default async function StudentSeasonPage() {
               </p>
               <ul className="mt-1 grid grid-cols-1 gap-1 text-sm md:grid-cols-2">
                 {membership.group.students.map((s) => (
-                  <li key={s.studentUser.id}>{s.studentUser.name ?? "â€”"}</li>
+                  <li key={s.studentUser.id}>{s.studentUser.name ?? "—"}</li>
                 ))}
               </ul>
             </div>
@@ -148,8 +148,8 @@ export default async function StudentSeasonPage() {
                 <li key={s.id} className="py-2 first:pt-0 last:pb-0">
                   <p className="text-sm font-medium">{s.title}</p>
                   <p className="text-xs text-muted-foreground">
-                    {format(s.startsAt, "EEE, MMM d آ· h:mm a")}
-                    {s.location && ` آ· ${s.location}`}
+                    {format(s.startsAt, "EEE, MMM d · h:mm a")}
+                    {s.location && ` · ${s.location}`}
                   </p>
                 </li>
               ))}

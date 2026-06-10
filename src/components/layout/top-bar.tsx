@@ -43,6 +43,7 @@ interface TopBarProps {
   role: UserRole;
   userId: number;
   initials: string;
+  avatarUrl?: string | null;
   signOutAction: () => Promise<void>;
   notifications: NotificationBellItem[];
   unreadCount: number;
@@ -55,6 +56,7 @@ export function TopBar({
   role,
   userId,
   initials,
+  avatarUrl,
   signOutAction,
   notifications,
   unreadCount,
@@ -115,6 +117,7 @@ export function TopBar({
           role={role}
           userId={userId}
           initials={initials}
+          avatarUrl={avatarUrl}
           signOutAction={signOutAction}
         />
       </div>

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole } from "@/lib/auth/permissions";
 import { listStudentsForScope } from "@/lib/students-query";
+import { getStorage } from "@/lib/storage";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { StudentsList } from "@/components/students/students-list";
@@ -19,18 +20,25 @@ export default async function SuperStudentsPage({
   requireRole(user, ["SUPER"]);
   const { q } = await searchParams;
   const rows = await listStudentsForScope(user, q);
+  const storage = getStorage();
+  const rowsWithAvatars = await Promise.all(
+    rows.map(async (r) => ({
+      ...r,
+      avatarUrl: r.avatarPath ? await storage.url(r.avatarPath) : null,
+    })),
+  );
 
   return (
     <>
       <PageHeader
         title="Students"
-        description={`${rows.length} student${rows.length === 1 ? "" : "s"}`}
+        description={`${rowsWithAvatars.length} student${rowsWithAvatars.length === 1 ? "" : "s"}`}
         actions={
           <Button render={<Link href="/super/students/new" />}>New student</Button>
         }
       />
       <SearchBox initial={q} action="/super/students" />
-      <StudentsList rows={rows} basePath="/super/students" />
+      <StudentsList rows={rowsWithAvatars} basePath="/super/students" />
     </>
   );
 }

@@ -48,7 +48,7 @@ export default async function StudentAssignmentsPage() {
                       </Link>
                       {r.dueAt && (
                         <p className="text-sm text-muted-foreground">
-                          Due {format(r.dueAt, "MMM d, yyyy آ· h:mm a")}
+                          Due {format(r.dueAt, "MMM d, yyyy · h:mm a")}
                           {!past && ` (in ${formatDistanceToNowStrict(r.dueAt)})`}
                         </p>
                       )}
