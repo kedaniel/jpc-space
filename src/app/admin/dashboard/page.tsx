@@ -14,15 +14,18 @@ export default async function AdminDashboard() {
   const user = await getCurrentUserOrRedirect();
   requireRole(user, ["SUPER", "ADMIN"]);
 
-  const season = await db.season.findFirst({
-    where: {
-      ...(user.role === "ADMIN" ? { id: { in: user.seasonAdminIds } } : {}),
-      status: "ACTIVE",
-      deletedAt: null,
-    },
-    select: { id: true, title: true, code: true },
-    orderBy: { startDate: "desc" },
-  });
+  const seasonIds = user.role === "ADMIN" ? user.seasonAdminIds : undefined;
+  const season =
+    (await db.season.findFirst({
+      where: { ...(seasonIds ? { id: { in: seasonIds } } : {}), status: "ACTIVE", deletedAt: null },
+      orderBy: { startDate: "desc" },
+      select: { id: true, title: true, code: true },
+    })) ??
+    (await db.season.findFirst({
+      where: { ...(seasonIds ? { id: { in: seasonIds } } : {}), deletedAt: null },
+      orderBy: { startDate: "desc" },
+      select: { id: true, title: true, code: true },
+    }));
 
   const seasonId = season?.id ?? null;
   const now = new Date();

@@ -10,15 +10,21 @@ export default async function AdminCalendarRedirectPage() {
   const user = await getCurrentUserOrRedirect();
   requireRole(user, ["ADMIN", "SUPER"]);
 
-  const season = await db.season.findFirst({
-    where: {
-      ...(user.role === "ADMIN" ? { id: { in: user.seasonAdminIds } } : {}),
-      deletedAt: null,
-      status: "ACTIVE",
-    },
-    orderBy: { startDate: "desc" },
-    select: { code: true },
-  });
+  const seasonIds =
+    user.role === "ADMIN" ? user.seasonAdminIds : undefined;
+
+  // Prefer the most recent ACTIVE season; fall back to any non-deleted season
+  const season =
+    (await db.season.findFirst({
+      where: { ...(seasonIds ? { id: { in: seasonIds } } : {}), deletedAt: null, status: "ACTIVE" },
+      orderBy: { startDate: "desc" },
+      select: { code: true },
+    })) ??
+    (await db.season.findFirst({
+      where: { ...(seasonIds ? { id: { in: seasonIds } } : {}), deletedAt: null },
+      orderBy: { startDate: "desc" },
+      select: { code: true },
+    }));
 
   if (!season) {
     return (

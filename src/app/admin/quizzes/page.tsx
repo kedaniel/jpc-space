@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { format } from "date-fns";
-import { PenLine } from "lucide-react";
+import { PenLine, ExternalLink } from "lucide-react";
 
 import { db } from "@/lib/db";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
@@ -14,15 +14,18 @@ export default async function AdminQuizzesPage() {
   const user = await getCurrentUserOrRedirect();
   requireRole(user, ["ADMIN", "SUPER"]);
 
-  const season = await db.season.findFirst({
-    where: {
-      ...(user.role === "ADMIN" ? { id: { in: user.seasonAdminIds } } : {}),
-      deletedAt: null,
-      status: "ACTIVE",
-    },
-    orderBy: { startDate: "desc" },
-    select: { id: true, title: true, code: true },
-  });
+  const seasonIds = user.role === "ADMIN" ? user.seasonAdminIds : undefined;
+  const season =
+    (await db.season.findFirst({
+      where: { ...(seasonIds ? { id: { in: seasonIds } } : {}), deletedAt: null, status: "ACTIVE" },
+      orderBy: { startDate: "desc" },
+      select: { id: true, title: true, code: true },
+    })) ??
+    (await db.season.findFirst({
+      where: { ...(seasonIds ? { id: { in: seasonIds } } : {}), deletedAt: null },
+      orderBy: { startDate: "desc" },
+      select: { id: true, title: true, code: true },
+    }));
 
   const totalStudents = season
     ? await db.studentProfile.count({ where: { activeSeasonId: season.id, deletedAt: null } })
@@ -46,18 +49,29 @@ export default async function AdminQuizzesPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div>
-        <h1 className="text-2xl font-black text-brand-navy-900">Quizzes</h1>
-        <p className="mt-1 text-sm text-neutral-500">
-          {season ? `All quizzes for ${season.title}` : "No active season"}
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-black text-brand-navy-900">Quizzes</h1>
+          <p className="mt-1 text-sm text-neutral-500">
+            {season ? `All quizzes for ${season.title}` : "No season found"}
+          </p>
+        </div>
+        {season && (
+          <Link
+            href={`/admin/season/${season.code}/calendar`}
+            className="flex items-center gap-1.5 rounded-lg bg-brand-teal-600 px-3 py-2 text-xs font-bold text-white transition-colors hover:bg-brand-teal-700"
+          >
+            <ExternalLink className="size-3" />
+            Go to sessions
+          </Link>
+        )}
       </div>
 
       {quizzes.length === 0 ? (
         <EmptyState
           icon={PenLine}
           title="No quizzes yet"
-          description="Create quizzes from the session detail page in My Season."
+          description="Open a session from the calendar, then use the Quizzes card to add one."
         />
       ) : (
         <div className="flex flex-col gap-3">
