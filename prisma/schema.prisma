@@ -67,6 +67,7 @@ enum NotificationType {
   SESSION_RESCHEDULED
   LOW_ATTENDANCE_FLAG
   MENTOR_FOLLOWUP
+  QUIZ_GRADED
 }
 
 enum JpcVisibility {
@@ -119,6 +120,10 @@ model User {
   studentDocuments       StudentDocument[]       @relation("StudentDocumentStudent")
   studentDocumentsUploaded StudentDocument[]     @relation("StudentDocumentUploader")
   jpcEventsCreated       JpcEvent[]              @relation("JpcEventCreator")
+
+  quizzesCreated  Quiz[]      @relation("QuizCreatedBy")
+  quizGrades      QuizGrade[] @relation("QuizGradeStudent")
+  quizGraded      QuizGrade[] @relation("QuizGradedBy")
 
   @@index([role])
   @@index([deletedAt])
@@ -213,6 +218,7 @@ model Season {
   enrollments       SeasonEnrollment[]
   activeForStudents StudentProfile[]   @relation("StudentActiveSeason")
   engagementNotes   EngagementNote[]
+  quizzes           Quiz[]
 
   @@index([status])
   @@index([startDate])
@@ -307,6 +313,7 @@ model Session {
   startsAt          DateTime
   durationMinutes   Int       @default(90)
   location          String?
+  youtubeUrl        String?
   description       String?
   materialsPath     String?
   // Sibling sessions created in the same recurrence batch share this id.
@@ -319,6 +326,7 @@ model Session {
 
   attendance  Attendance[]
   assignments Assignment[]
+  quizzes     Quiz[]
 
   @@index([seasonId, startsAt])
   @@index([recurrenceGroupId])
@@ -479,6 +487,7 @@ model NotificationPreference {
   sessionRescheduled  Boolean @default(true)
   lowAttendanceFlag   Boolean @default(true)
   mentorFollowup      Boolean @default(true)
+  quizGraded          Boolean @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -496,6 +505,47 @@ model StudentDocument {
   sizeBytes     Int
   uploadedAt    DateTime @default(now())
 
+  @@index([studentUserId])
+}
+
+// ---------------------------------------------------------------------------
+// Quizzes (paper-based, graded by leader/admin)
+// ---------------------------------------------------------------------------
+
+model Quiz {
+  id          Int       @id @default(autoincrement())
+  seasonId    Int
+  season      Season    @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+  sessionId   Int?
+  session     Session?  @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+  title       String
+  maxScore    Int       @default(100)
+  createdById Int?
+  createdBy   User?     @relation("QuizCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  grades      QuizGrade[]
+
+  @@index([seasonId])
+  @@index([sessionId])
+}
+
+model QuizGrade {
+  id            Int       @id @default(autoincrement())
+  quizId        Int
+  quiz          Quiz      @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  studentUserId Int
+  studentUser   User      @relation("QuizGradeStudent", fields: [studentUserId], references: [id], onDelete: Restrict)
+  score         Int?
+  notes         String?
+  gradedById    Int?
+  gradedBy      User?     @relation("QuizGradedBy", fields: [gradedById], references: [id], onDelete: SetNull)
+  gradedAt      DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([quizId, studentUserId])
   @@index([studentUserId])
 }
 

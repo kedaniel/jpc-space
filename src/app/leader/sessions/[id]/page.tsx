@@ -1,13 +1,14 @@
 import { format } from "date-fns";
 import { notFound } from "next/navigation";
-import { QrCode } from "lucide-react";
+import { PenLine, QrCode } from "lucide-react";
+import Link from "next/link";
 
 import { db } from "@/lib/db";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole } from "@/lib/auth/permissions";
 import { isLeaderInSeason } from "@/lib/rbac";
 import { loadSessionById } from "@/lib/sessions-query";
-import { PageHeader } from "@/components/layout/page-header";
+import { listQuizzesForSession } from "@/lib/quiz-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckInAttendanceList } from "@/components/sessions/check-in-attendance-list";
@@ -57,6 +58,8 @@ export default async function LeaderSessionPage({ params }: PageProps) {
     },
   });
 
+  const quizzes = await listQuizzesForSession(session.id);
+
   const studentRows = groupStudents.map((gs) => ({
     userId: gs.studentUser.id,
     name: gs.studentUser.name ?? "",
@@ -65,11 +68,40 @@ export default async function LeaderSessionPage({ params }: PageProps) {
   }));
 
   return (
-    <>
-      <PageHeader
-        title={session.title}
-        description={format(session.startsAt, "EEE, MMM d · h:mm a")}
-      />
+    <div className="flex flex-col gap-4">
+      <div>
+        <h1 className="text-2xl font-black text-brand-navy-900">{session.title}</h1>
+        <p className="mt-1 text-sm text-neutral-500">{format(session.startsAt, "EEE, MMM d · h:mm a")}</p>
+      </div>
+
+      {quizzes.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <PenLine className="size-4 text-brand-teal-600" />
+              Quizzes
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="flex flex-col divide-y divide-neutral-100">
+              {quizzes.map((q) => (
+                <li key={q.id} className="flex items-center justify-between gap-3 py-2 first:pt-0 last:pb-0">
+                  <div>
+                    <p className="text-sm font-semibold text-brand-navy-900">{q.title}</p>
+                    <p className="text-xs text-neutral-500">Max score: {q.maxScore}</p>
+                  </div>
+                  <Link
+                    href={`/leader/sessions/${session.id}/quiz/${q.id}`}
+                    className="text-xs font-semibold text-brand-teal-700 hover:underline"
+                  >
+                    Grade →
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
@@ -92,6 +124,6 @@ export default async function LeaderSessionPage({ params }: PageProps) {
           />
         </CardContent>
       </Card>
-    </>
+    </div>
   );
 }

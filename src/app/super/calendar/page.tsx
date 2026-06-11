@@ -5,7 +5,6 @@ import { requireRole } from "@/lib/auth/permissions";
 import { listSessionsForAllActiveSeasons } from "@/lib/sessions-query";
 import { listJpcEvents } from "@/lib/jpc-events-query";
 import { SEASON_PALETTE, SeasonCalendar } from "@/components/sessions/season-calendar";
-import { PageHeader } from "@/components/layout/page-header";
 
 export const metadata: Metadata = { title: "Calendar" };
 
@@ -26,14 +25,17 @@ export default async function SuperCalendarPage() {
   });
 
   return (
-    <>
-      <PageHeader title="Calendar" description="All active seasons across JPC." />
+    <div className="flex flex-col gap-4">
+      <div>
+        <h1 className="text-2xl font-black text-brand-navy-900">Calendar</h1>
+        <p className="mt-1 text-sm text-neutral-500">All active seasons across JPC.</p>
+      </div>
       <SeasonCalendar
         sessions={sessions}
         jpcEvents={jpcEvents}
         sessionPathTemplate="/admin/season/{seasonCode}/sessions/{id}"
         seasonColors={seasonColors}
       />
-    </>
+    </div>
   );
 }

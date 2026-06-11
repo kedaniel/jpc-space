@@ -62,7 +62,10 @@ export function SeasonCalendar({
 }: SeasonCalendarProps) {
   const [current, setCurrent] = React.useState<Date>(() => {
     const upcoming = sessions.find((s) => !isPast(s.startsAt) || isToday(s.startsAt));
-    return startOfMonth(upcoming?.startsAt ?? new Date());
+    if (upcoming) return startOfMonth(upcoming.startsAt);
+    // All sessions are past — show the most recent session's month so the calendar isn't empty
+    const last = sessions.at(-1);
+    return startOfMonth(last?.startsAt ?? new Date());
   });
 
   if (sessions.length === 0 && jpcEvents.length === 0) {

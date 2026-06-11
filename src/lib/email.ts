@@ -132,3 +132,28 @@ export async function sendInviteEmail(
     html: renderShell("Welcome to JPC Space", "Jesus Project Community", body),
   });
 }
+
+export async function sendNotificationEmail(
+  email: string,
+  title: string,
+  body: string | null,
+  link: string | null,
+): Promise<void> {
+  const appUrl = (process.env.AUTH_URL ?? "").replace(/\/$/, "");
+  const viewLink = appUrl ? `${appUrl}${link ?? ""}` : null;
+
+  const bodyHtml = `
+    <p style="font-size: 16px; color: ${TEXT}; line-height: 1.6; margin: 0 0 24px 0;">
+      ${body ?? "You have a new notification in JPC Space."}
+    </p>
+    ${viewLink ? buttonHtml(viewLink, "View in JPC Space") : ""}
+  `;
+
+  const transporter = getTransporter();
+  await transporter.sendMail({
+    from: fromAddress(),
+    to: email,
+    subject: `JPC Space — ${title}`,
+    html: renderShell(title, "Jesus Project Community", bodyHtml),
+  });
+}

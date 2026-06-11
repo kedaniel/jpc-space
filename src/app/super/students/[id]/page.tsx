@@ -4,7 +4,6 @@ import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole, canViewStudent, canEditStudent, canWriteNote } from "@/lib/auth/permissions";
 import { filterVisibleNotes, loadStudentDetail } from "@/lib/students-query";
 import { computeEngagementForStudent } from "@/lib/engagement";
-import { PageHeader } from "@/components/layout/page-header";
 import { StudentDetail } from "@/components/students/student-detail";
 
 interface PageProps {
@@ -27,11 +26,11 @@ export default async function SuperStudentDetailPage({ params }: PageProps) {
   const visibleNotes = filterVisibleNotes(student.notes, user);
 
   return (
-    <>
-      <PageHeader
-        title={student.name ?? student.email}
-        description={student.email}
-      />
+    <div className="flex flex-col gap-4">
+      <div>
+        <h1 className="text-2xl font-black text-brand-navy-900">{student.name ?? student.email}</h1>
+        <p className="mt-1 text-sm text-neutral-500">{student.email}</p>
+      </div>
       <StudentDetail
         student={student}
         engagement={engagement}
@@ -40,6 +39,6 @@ export default async function SuperStudentDetailPage({ params }: PageProps) {
         canWriteNote={await canWriteNote(user, studentUserId)}
         editHref={`/super/students/${student.id}/edit`}
       />
-    </>
+    </div>
   );
 }

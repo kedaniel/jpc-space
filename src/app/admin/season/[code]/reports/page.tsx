@@ -5,7 +5,6 @@ import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole, canEditSeason } from "@/lib/auth/permissions";
 import { loadSeasonByCode } from "@/lib/seasons-query";
 import { loadReportsData } from "@/lib/reports-query";
-import { PageHeader } from "@/components/layout/page-header";
 import { ReportsView } from "@/components/reports/reports-view";
 
 interface PageProps {
@@ -27,13 +26,16 @@ export default async function AdminSeasonReportsPage({ params }: PageProps) {
   const data = await loadReportsData({ seasonIds: [season.id] });
 
   return (
-    <>
-      <PageHeader title="Reports" description={`Scoped to ${season.title}.`} />
+    <div className="flex flex-col gap-4">
+      <div>
+        <h1 className="text-2xl font-black text-brand-navy-900">Reports</h1>
+        <p className="mt-1 text-sm text-neutral-500">{`Scoped to ${season.title}.`}</p>
+      </div>
       <ReportsView
         data={data}
         exportCsvHref={`/api/reports/export?season=${season.id}`}
         studentDetailBase="/admin/students"
       />
-    </>
+    </div>
   );
 }

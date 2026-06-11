@@ -9,7 +9,6 @@ import {
   listLeadersForPicker,
   listStudentsForPicker,
 } from "@/lib/groups-query";
-import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { GroupForm } from "@/components/groups/group-form";
 
@@ -34,8 +33,11 @@ export default async function EditGroupPage({ params }: PageProps) {
   if (group.seasonId !== season.id) redirect(`/admin/season/${season.code}/groups`);
 
   return (
-    <>
-      <PageHeader title={`Edit ${group.name}`} description="Update group details and membership." />
+    <div className="flex flex-col gap-4">
+      <div>
+        <h1 className="text-2xl font-black text-brand-navy-900">{`Edit ${group.name}`}</h1>
+        <p className="mt-1 text-sm text-neutral-500">Update group details and membership.</p>
+      </div>
       <Card>
         <CardContent className="pt-6">
           <GroupForm
@@ -54,6 +56,6 @@ export default async function EditGroupPage({ params }: PageProps) {
           />
         </CardContent>
       </Card>
-    </>
+    </div>
   );
 }

@@ -4,8 +4,6 @@ import { Sparkles } from "lucide-react";
 import { db } from "@/lib/db";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole } from "@/lib/auth/permissions";
-import { PageHeader } from "@/components/layout/page-header";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 
@@ -49,14 +47,14 @@ export default async function StudentHistoryPage() {
 
   if (enrollments.length === 0) {
     return (
-      <>
-        <PageHeader title="History" description="Seasons you've participated in." />
+      <div className="flex flex-col gap-3 md:gap-4">
+        <h1 className="text-2xl font-black text-brand-navy-900">History</h1>
         <EmptyState
           icon={Sparkles}
           title="No past seasons"
           description="Once you complete a season, it'll appear here."
         />
-      </>
+      </div>
     );
   }
 
@@ -87,60 +85,71 @@ export default async function StudentHistoryPage() {
   }
 
   return (
-    <>
-      <PageHeader
-        title="History"
-        description="Past seasons you participated in."
-      />
-      <ol className="flex flex-col gap-4">
+    <div className="flex flex-col gap-3 md:gap-4">
+      <div>
+        <h1 className="text-2xl font-black text-brand-navy-900">History</h1>
+        <p className="mt-1 text-sm text-neutral-500">
+          Seasons you&apos;ve participated in
+        </p>
+      </div>
+
+      <ol className="flex flex-col gap-3">
         {enrollments.map((e) => {
-          const att = attendanceByseason.get(e.seasonId) ?? { total: 0, present: 0 };
-          const attendancePct = att.total > 0 ? Math.round((att.present / att.total) * 100) : 0;
+          const att = attendanceByseason.get(e.seasonId) ?? {
+            total: 0,
+            present: 0,
+          };
+          const attendancePct =
+            att.total > 0 ? Math.round((att.present / att.total) * 100) : 0;
           const sessions = curriculaBySeason.get(e.seasonId) ?? [];
+
           return (
             <li key={e.seasonId}>
-              <Card>
-                <CardHeader>
-                  <div className="flex flex-wrap items-start justify-between gap-2">
-                    <div>
-                      <CardTitle className="text-base">{e.season.title}</CardTitle>
-                      <p className="text-xs text-muted-foreground">
-                        {format(e.season.startDate, "MMM d, yyyy")} –{" "}
-                        {format(e.season.endDate, "MMM d, yyyy")}
-                        {e.group?.name && ` · ${e.group.name}`}
-                      </p>
-                    </div>
-                    <div className="flex flex-wrap gap-1.5">
-                      <Badge variant="outline">{e.season.status}</Badge>
-                      <Badge variant="success">Participated</Badge>
-                      <Badge variant="info">{attendancePct}% attendance</Badge>
-                    </div>
+              <div className="rounded-xl bg-white p-4 shadow-[0_1px_3px_rgba(0,0,0,0.05),0_4px_12px_rgba(0,0,0,0.04)] ring-1 ring-neutral-200/60">
+                {/* Season title row */}
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <div>
+                    <p className="text-base font-bold text-brand-navy-900">
+                      {e.season.title}
+                    </p>
+                    <p className="text-xs text-neutral-500">
+                      {format(e.season.startDate, "MMM d, yyyy")} –{" "}
+                      {format(e.season.endDate, "MMM d, yyyy")}
+                      {e.group?.name && ` · ${e.group.name}`}
+                    </p>
                   </div>
-                </CardHeader>
+                  <div className="flex flex-wrap gap-1.5">
+                    <Badge variant="teal">{attendancePct}% attended</Badge>
+                    <Badge variant="success">Participated</Badge>
+                  </div>
+                </div>
+
+                {/* Curriculum accordion */}
                 {sessions.length > 0 && (
-                  <CardContent>
-                    <details className="text-sm">
-                      <summary className="cursor-pointer font-medium text-foreground">
-                        Curriculum ({sessions.length} sessions)
-                      </summary>
-                      <ol className="mt-2 flex flex-col gap-1 text-muted-foreground">
-                        {sessions.map((s) => (
-                          <li key={s.id} className="flex justify-between gap-3">
-                            <span>{s.title}</span>
-                            <span className="shrink-0 text-xs tabular-nums">
-                              {format(s.startsAt, "MMM d, yyyy")}
-                            </span>
-                          </li>
-                        ))}
-                      </ol>
-                    </details>
-                  </CardContent>
+                  <details className="mt-3 text-sm">
+                    <summary className="cursor-pointer font-semibold text-brand-navy-700">
+                      Curriculum ({sessions.length} sessions)
+                    </summary>
+                    <ol className="mt-2 flex flex-col gap-1 text-neutral-500">
+                      {sessions.map((s) => (
+                        <li
+                          key={s.id}
+                          className="flex justify-between gap-3 border-t border-neutral-100 pt-1 first:border-0 first:pt-0"
+                        >
+                          <span>{s.title}</span>
+                          <span className="shrink-0 text-xs tabular-nums">
+                            {format(s.startsAt, "MMM d, yyyy")}
+                          </span>
+                        </li>
+                      ))}
+                    </ol>
+                  </details>
                 )}
-              </Card>
+              </div>
             </li>
           );
         })}
       </ol>
-    </>
+    </div>
   );
 }

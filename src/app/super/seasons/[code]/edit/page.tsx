@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole } from "@/lib/auth/permissions";
-import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { SeasonForm } from "@/components/seasons/season-form";
 import { DeleteSeasonButton } from "@/components/seasons/delete-season-button";
@@ -39,12 +38,14 @@ export default async function EditSeasonPage({ params }: PageProps) {
   if (!season) notFound();
 
   return (
-    <>
-      <PageHeader
-        title={`Edit · ${season.title}`}
-        description={`Code: ${season.code}`}
-        actions={<DeleteSeasonButton seasonId={season.id} title={season.title} />}
-      />
+    <div className="flex flex-col gap-4">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-black text-brand-navy-900">Edit · {season.title}</h1>
+          <p className="mt-1 text-sm text-neutral-500">Code: {season.code}</p>
+        </div>
+        <DeleteSeasonButton seasonId={season.id} title={season.title} />
+      </div>
       <Card>
         <CardContent className="pt-6">
           <SeasonForm
@@ -65,6 +66,6 @@ export default async function EditSeasonPage({ params }: PageProps) {
           />
         </CardContent>
       </Card>
-    </>
+    </div>
   );
 }

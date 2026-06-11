@@ -7,7 +7,6 @@ import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole, canEditSeason } from "@/lib/auth/permissions";
 import { loadSeasonByCode } from "@/lib/seasons-query";
 import { loadAssignmentById, loadSubmissionTracker } from "@/lib/assignments-query";
-import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -37,27 +36,27 @@ export default async function AdminAssignmentDetailPage({ params }: PageProps) {
   const submitted = tracker.filter((r) => r.status !== "PENDING").length;
 
   return (
-    <>
-      <PageHeader
-        title={assignment.title}
-        description={
-          assignment.dueAt
-            ? `Due ${format(assignment.dueAt, "EEE, MMM d, yyyy · h:mm a")}`
-            : "No due date"
-        }
-        actions={
-          <Button
-            variant="outline"
-            render={
-              <Link
-                href={`/admin/season/${season.code}/assignments/${assignment.id}/edit`}
-              />
-            }
-          >
-            Edit assignment
-          </Button>
-        }
-      />
+    <div className="flex flex-col gap-4">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-black text-brand-navy-900">{assignment.title}</h1>
+          <p className="mt-1 text-sm text-neutral-500">
+            {assignment.dueAt
+              ? `Due ${format(assignment.dueAt, "EEE, MMM d, yyyy · h:mm a")}`
+              : "No due date"}
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          render={
+            <Link
+              href={`/admin/season/${season.code}/assignments/${assignment.id}/edit`}
+            />
+          }
+        >
+          Edit assignment
+        </Button>
+      </div>
 
       {assignment.description && (
         <Card className="mb-4">
@@ -90,6 +89,6 @@ export default async function AdminAssignmentDetailPage({ params }: PageProps) {
         rows={tracker}
         reviewBasePath="/leader/submissions"
       />
-    </>
+    </div>
   );
 }

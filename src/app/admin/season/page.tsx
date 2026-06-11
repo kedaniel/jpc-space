@@ -4,7 +4,6 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole } from "@/lib/auth/permissions";
-import { PageHeader } from "@/components/layout/page-header";
 import { SeasonsList, type SeasonRow } from "@/components/seasons/seasons-list";
 
 export const metadata: Metadata = { title: "My Season" };
@@ -15,12 +14,12 @@ export default async function AdminSeasonsPage() {
 
   if (user.seasonAdminIds.length === 0) {
     return (
-      <>
-        <PageHeader
-          title="My Season"
-          description="You aren't assigned to a season yet. Contact a super-admin to be added."
-        />
-      </>
+      <div className="flex flex-col gap-4">
+        <div>
+          <h1 className="text-2xl font-black text-brand-navy-900">My Season</h1>
+          <p className="mt-1 text-sm text-neutral-500">You aren&apos;t assigned to a season yet. Contact a super-admin to be added.</p>
+        </div>
+      </div>
     );
   }
 
@@ -51,12 +50,12 @@ export default async function AdminSeasonsPage() {
   }));
 
   return (
-    <>
-      <PageHeader
-        title="My Season"
-        description="Seasons you administer."
-      />
+    <div className="flex flex-col gap-4">
+      <div>
+        <h1 className="text-2xl font-black text-brand-navy-900">My Season</h1>
+        <p className="mt-1 text-sm text-neutral-500">Seasons you administer.</p>
+      </div>
       <SeasonsList rows={rows} basePath="/admin/season" />
-    </>
+    </div>
   );
 }

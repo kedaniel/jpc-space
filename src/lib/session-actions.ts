@@ -22,6 +22,7 @@ const sessionSchema = z.object({
   startsAt: z.coerce.date(),
   durationMinutes: z.number().int().min(15).max(600),
   location: z.string().max(200).optional().nullable(),
+  youtubeUrl: z.string().url().optional().nullable(),
   description: z.string().max(2000).optional().nullable(),
 });
 
@@ -30,6 +31,7 @@ export interface SessionInput {
   startsAt: Date | string;
   durationMinutes: number;
   location?: string | null;
+  youtubeUrl?: string | null;
   description?: string | null;
 }
 
@@ -62,6 +64,7 @@ export async function createSessionAction(
             startsAt,
             durationMinutes: parsed.data.durationMinutes,
             location: parsed.data.location ?? null,
+            youtubeUrl: parsed.data.youtubeUrl ?? null,
             description: parsed.data.description ?? null,
             recurrenceGroupId,
           },
@@ -126,6 +129,7 @@ export async function updateSessionAction(
         startsAt: parsed.data.startsAt,
         durationMinutes: parsed.data.durationMinutes,
         location: parsed.data.location ?? null,
+        youtubeUrl: parsed.data.youtubeUrl ?? null,
         description: parsed.data.description ?? null,
       },
     });
@@ -140,6 +144,7 @@ export async function updateSessionAction(
             startsAt: new Date(t.startsAt.getTime() + delta),
             durationMinutes: parsed.data.durationMinutes,
             location: parsed.data.location ?? null,
+            youtubeUrl: parsed.data.youtubeUrl ?? null,
             description: parsed.data.description ?? null,
           },
         }),

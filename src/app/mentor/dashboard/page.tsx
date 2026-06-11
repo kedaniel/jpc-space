@@ -6,7 +6,6 @@ import { db } from "@/lib/db";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole } from "@/lib/auth/permissions";
 import { computeEngagementForStudent } from "@/lib/engagement";
-import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -91,11 +90,11 @@ export default async function MentorDashboard() {
   });
 
   return (
-    <>
-      <PageHeader
-        title="Mentor dashboard"
-        description="Cross-season pastoral view. You can read everything; writes are limited to your notes."
-      />
+    <div className="flex flex-col gap-4">
+      <div>
+        <h1 className="text-2xl font-black text-brand-navy-900">Mentor dashboard</h1>
+        <p className="mt-1 text-sm text-neutral-500">Cross-season pastoral view. You can read everything; writes are limited to your notes.</p>
+      </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <Card>
@@ -118,7 +117,7 @@ export default async function MentorDashboard() {
                 description="All students above the 60% engagement threshold."
               />
             ) : (
-              <ul className="flex flex-col divide-y divide-border">
+              <ul className="flex flex-col divide-y divide-neutral-100">
                 {atRisk.map((s) => (
                   <li key={s.id} className="py-2 first:pt-0 last:pb-0">
                     <Link
@@ -127,7 +126,7 @@ export default async function MentorDashboard() {
                     >
                       <span className="flex flex-col">
                         <span className="text-sm font-medium">{s.name ?? s.email}</span>
-                        <span className="text-xs text-muted-foreground">{s.seasonTitle}</span>
+                        <span className="text-xs text-neutral-500">{s.seasonTitle}</span>
                       </span>
                       <span className="flex shrink-0 gap-1">
                         <Badge variant="warning" className="text-[10px]">
@@ -155,7 +154,7 @@ export default async function MentorDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ul className="flex flex-col divide-y divide-border">
+            <ul className="flex flex-col divide-y divide-neutral-100">
               {recentAttendance.slice(0, 4).map((a) => (
                 <li
                   key={`att-${a.id}`}
@@ -168,11 +167,11 @@ export default async function MentorDashboard() {
                     >
                       {a.studentUser.name ?? "Student"}
                     </Link>{" "}
-                    <span className="text-muted-foreground">
+                    <span className="text-neutral-500">
                       marked {a.status.toLowerCase()} for {a.session.title}
                     </span>
                   </span>
-                  <span className="shrink-0 text-xs text-muted-foreground">
+                  <span className="shrink-0 text-xs text-neutral-500">
                     {formatDistanceToNowStrict(a.markedAt, { addSuffix: true })}
                   </span>
                 </li>
@@ -189,7 +188,7 @@ export default async function MentorDashboard() {
                     >
                       {s.studentUser.name ?? "Student"}
                     </Link>{" "}
-                    <span className="text-muted-foreground">
+                    <span className="text-neutral-500">
                       {s.status === "REVIEWED" ? "received feedback on" : "submitted"}{" "}
                     </span>
                     <Link
@@ -200,14 +199,14 @@ export default async function MentorDashboard() {
                     </Link>
                   </span>
                   {s.submittedAt && (
-                    <span className="shrink-0 text-xs text-muted-foreground">
+                    <span className="shrink-0 text-xs text-neutral-500">
                       {formatDistanceToNowStrict(s.submittedAt, { addSuffix: true })}
                     </span>
                   )}
                 </li>
               ))}
               {recentAttendance.length === 0 && recentSubmissions.length === 0 && (
-                <p className="py-4 text-center text-sm italic text-muted-foreground">
+                <p className="py-4 text-center text-sm italic text-neutral-500">
                   No recent activity.
                 </p>
               )}
@@ -216,13 +215,13 @@ export default async function MentorDashboard() {
         </Card>
       </div>
 
-      <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <QuickLink href="/mentor/students" label="Students" />
         <QuickLink href="/mentor/notes" label="My notes" />
         <QuickLink href="/mentor/reports" label="Reports" />
         <QuickLink href="/mentor/settings" label="Settings" />
       </div>
-    </>
+    </div>
   );
 }
 
@@ -230,7 +229,7 @@ function QuickLink({ href, label }: { href: string; label: string }) {
   return (
     <Link
       href={href}
-      className="rounded-lg border border-border bg-card p-3 text-center text-sm font-medium text-foreground transition-colors hover:border-brand-teal-400 hover:bg-brand-teal-50 dark:hover:bg-brand-teal-950/40"
+      className="rounded-lg border border-neutral-100 bg-card p-3 text-center text-sm font-medium text-foreground transition-colors hover:border-brand-teal-400 hover:bg-brand-teal-50 dark:hover:bg-brand-teal-950/40"
     >
       {label}
     </Link>

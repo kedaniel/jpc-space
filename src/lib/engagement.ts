@@ -154,3 +154,118 @@ export async function computeAttendanceBudget(
     lateCount,
   };
 }
+
+export interface AtRiskStudent {
+  userId: number;
+  name: string;
+  minutesUsed: number;
+  budgetMinutes: number;
+  minutesOver: number;
+  absentCount: number;
+  lateCount: number;
+}
+
+/**
+ * Returns students whose absence minutes exceed the season budget.
+ * Pass `studentUserIds` to scope to a group (leader); omit for the whole season (admin).
+ */
+export async function computeAtRiskStudents(
+  seasonId: number,
+  studentUserIds?: number[],
+): Promise<AtRiskStudent[]> {
+  const season = await db.season.findUnique({
+    where: { id: seasonId },
+    select: {
+      absenceBudgetMinutes: true,
+      absenceWeightMinutes: true,
+      lateWeightMinutes: true,
+    },
+  });
+  if (!season) return [];
+
+  // Fetch enrollments, optionally filtered to specific students
+  const enrollments = await db.seasonEnrollment.findMany({
+    where: {
+      seasonId,
+      status: "ACTIVE",
+      ...(studentUserIds ? { studentUserId: { in: studentUserIds } } : {}),
+    },
+    select: {
+      studentUserId: true,
+      studentUser: { select: { name: true } },
+    },
+  });
+  if (enrollments.length === 0) return [];
+
+  const ids = enrollments.map((e) => e.studentUserId);
+
+  // Bulk count absences and lates per student
+  const counts = await db.attendance.groupBy({
+    by: ["studentUserId", "status"],
+    where: {
+      studentUserId: { in: ids },
+      status: { in: ["ABSENT", "LATE"] },
+      session: { seasonId },
+    },
+    _count: { status: true },
+  });
+
+  const byStudent = new Map<number, { absent: number; late: number }>();
+  for (const row of counts) {
+    const entry = byStudent.get(row.studentUserId) ?? { absent: 0, late: 0 };
+    if (row.status === "ABSENT") entry.absent = row._count.status;
+    if (row.status === "LATE") entry.late = row._count.status;
+    byStudent.set(row.studentUserId, entry);
+  }
+
+  const results: AtRiskStudent[] = [];
+  for (const e of enrollments) {
+    const { absent = 0, late = 0 } = byStudent.get(e.studentUserId) ?? {};
+    const minutesUsed =
+      absent * season.absenceWeightMinutes + late * season.lateWeightMinutes;
+    if (minutesUsed >= season.absenceBudgetMinutes) {
+      results.push({
+        userId: e.studentUserId,
+        name: e.studentUser.name,
+        minutesUsed,
+        budgetMinutes: season.absenceBudgetMinutes,
+        minutesOver: minutesUsed - season.absenceBudgetMinutes,
+        absentCount: absent,
+        lateCount: late,
+      });
+    }
+  }
+
+  return results.sort((a, b) => b.minutesOver - a.minutesOver);
+}
+
+/**
+ * Consecutive sessions attended (PRESENT or LATE) counting backwards from
+ * the most recent past session. EXCUSED does not break or increment the streak.
+ * ABSENT resets it. Sessions with no attendance record are skipped (not penalised).
+ */
+export async function computeAttendanceStreak(
+  studentUserId: number,
+  seasonId: number,
+): Promise<number> {
+  const sessions = await db.session.findMany({
+    where: { seasonId, startsAt: { lte: new Date() } },
+    orderBy: { startsAt: "desc" },
+    select: {
+      attendance: {
+        where: { studentUserId },
+        select: { status: true },
+      },
+    },
+  });
+
+  let streak = 0;
+  for (const session of sessions) {
+    const record = session.attendance[0];
+    if (!record) continue; // no record — skip, don't break
+    if (record.status === "ABSENT") break; // breaks streak
+    if (record.status === "PRESENT" || record.status === "LATE") streak++;
+    // EXCUSED: don't increment, don't break
+  }
+  return streak;
+}

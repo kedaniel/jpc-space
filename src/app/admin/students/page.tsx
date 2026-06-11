@@ -5,7 +5,6 @@ import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole } from "@/lib/auth/permissions";
 import { listStudentsForScope } from "@/lib/students-query";
 import { getStorage } from "@/lib/storage";
-import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { StudentsList } from "@/components/students/students-list";
 
@@ -29,14 +28,14 @@ export default async function AdminStudentsPage({
   );
 
   return (
-    <>
-      <PageHeader
-        title="Students"
-        description={`${rowsWithAvatars.length} student${rowsWithAvatars.length === 1 ? "" : "s"} in your seasons`}
-        actions={
-          <Button render={<Link href="/super/students/new" />}>New student</Button>
-        }
-      />
+    <div className="flex flex-col gap-4">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-black text-brand-navy-900">Students</h1>
+          <p className="mt-1 text-sm text-neutral-500">{`${rowsWithAvatars.length} student${rowsWithAvatars.length === 1 ? "" : "s"} in your seasons`}</p>
+        </div>
+        <Button render={<Link href="/super/students/new" />}>New student</Button>
+      </div>
       <form action="/admin/students" method="get" className="mb-4 flex gap-2">
         <input
           type="search"
@@ -50,6 +49,6 @@ export default async function AdminStudentsPage({
         </Button>
       </form>
       <StudentsList rows={rowsWithAvatars} basePath="/admin/students" />
-    </>
+    </div>
   );
 }

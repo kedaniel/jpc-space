@@ -6,7 +6,6 @@ import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole, canEditSeason } from "@/lib/auth/permissions";
 import { loadSeasonByCode } from "@/lib/seasons-query";
 import { loadAssignmentById } from "@/lib/assignments-query";
-import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { AssignmentForm } from "@/components/assignments/assignment-form";
 
@@ -40,8 +39,11 @@ export default async function EditAssignmentPage({ params }: PageProps) {
   ]);
 
   return (
-    <>
-      <PageHeader title="Edit assignment" description={assignment.title} />
+    <div className="flex flex-col gap-4">
+      <div>
+        <h1 className="text-2xl font-black text-brand-navy-900">Edit assignment</h1>
+        <p className="mt-1 text-sm text-neutral-500">{assignment.title}</p>
+      </div>
       <Card>
         <CardContent className="pt-6">
           <AssignmentForm
@@ -64,6 +66,6 @@ export default async function EditAssignmentPage({ params }: PageProps) {
           />
         </CardContent>
       </Card>
-    </>
+    </div>
   );
 }

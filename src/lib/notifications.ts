@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { sendNotificationEmail } from "@/lib/email";
 import type { NotificationType } from "@/generated/prisma/enums";
 
 export interface CreateNotificationInput {
@@ -19,6 +20,7 @@ const PREF_FIELD: Record<NotificationType, string> = {
   SESSION_RESCHEDULED: "sessionRescheduled",
   LOW_ATTENDANCE_FLAG: "lowAttendanceFlag",
   MENTOR_FOLLOWUP: "mentorFollowup",
+  QUIZ_GRADED: "quizGraded",
 };
 
 async function userAllowsType(userId: number, type: NotificationType): Promise<boolean> {
@@ -32,15 +34,23 @@ async function userAllowsType(userId: number, type: NotificationType): Promise<b
 
 export async function createNotification(input: CreateNotificationInput): Promise<void> {
   if (!(await userAllowsType(input.userId, input.type))) return;
-  await db.notification.create({
-    data: {
-      userId: input.userId,
-      type: input.type,
-      title: input.title,
-      body: input.body,
-      link: input.link,
-    },
-  });
+  const [, user] = await Promise.all([
+    db.notification.create({
+      data: {
+        userId: input.userId,
+        type: input.type,
+        title: input.title,
+        body: input.body,
+        link: input.link,
+      },
+    }),
+    db.user.findUnique({ where: { id: input.userId }, select: { email: true } }),
+  ]);
+  if (user) {
+    sendNotificationEmail(user.email, input.title, input.body ?? null, input.link ?? null).catch(
+      () => undefined,
+    );
+  }
 }
 
 export async function createNotificationsBulk(
@@ -73,6 +83,15 @@ export async function createNotificationsBulk(
       link: payload.link,
     })),
   });
+  const users = await db.user.findMany({
+    where: { id: { in: targets } },
+    select: { email: true },
+  });
+  void Promise.allSettled(
+    users.map((u) =>
+      sendNotificationEmail(u.email, payload.title, payload.body ?? null, payload.link ?? null),
+    ),
+  );
 }
 
 export async function unreadCount(userId: number): Promise<number> {

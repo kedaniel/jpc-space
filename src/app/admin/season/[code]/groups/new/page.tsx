@@ -8,7 +8,6 @@ import {
   listLeadersForPicker,
   listStudentsForPicker,
 } from "@/lib/groups-query";
-import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { GroupForm } from "@/components/groups/group-form";
 
@@ -31,11 +30,11 @@ export default async function NewGroupPage({ params }: PageProps) {
   ]);
 
   return (
-    <>
-      <PageHeader
-        title="New group"
-        description={`Add a group to ${season.title}.`}
-      />
+    <div className="flex flex-col gap-4">
+      <div>
+        <h1 className="text-2xl font-black text-brand-navy-900">New group</h1>
+        <p className="mt-1 text-sm text-neutral-500">{`Add a group to ${season.title}.`}</p>
+      </div>
       <Card>
         <CardContent className="pt-6">
           <GroupForm
@@ -47,6 +46,6 @@ export default async function NewGroupPage({ params }: PageProps) {
           />
         </CardContent>
       </Card>
-    </>
+    </div>
   );
 }

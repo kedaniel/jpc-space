@@ -4,7 +4,6 @@ import { Users } from "lucide-react";
 import { db } from "@/lib/db";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole } from "@/lib/auth/permissions";
-import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 
@@ -16,14 +15,17 @@ export default async function LeaderGroupsPage() {
 
   if (user.groupLeaderIds.length === 0) {
     return (
-      <>
-        <PageHeader title="My groups" description="You don't lead any groups yet." />
+      <div className="flex flex-col gap-4">
+        <div>
+          <h1 className="text-2xl font-black text-brand-navy-900">My groups</h1>
+          <p className="mt-1 text-sm text-neutral-500">You don&apos;t lead any groups yet.</p>
+        </div>
         <EmptyState
           icon={Users}
           title="No groups"
           description="An admin will add you to a group when you're ready."
         />
-      </>
+      </div>
     );
   }
 
@@ -45,29 +47,29 @@ export default async function LeaderGroupsPage() {
   });
 
   return (
-    <>
-      <PageHeader
-        title="My groups"
-        description={`${groups.length} group${groups.length === 1 ? "" : "s"}`}
-      />
+    <div className="flex flex-col gap-4">
+      <div>
+        <h1 className="text-2xl font-black text-brand-navy-900">My groups</h1>
+        <p className="mt-1 text-sm text-neutral-500">{`${groups.length} group${groups.length === 1 ? "" : "s"}`}</p>
+      </div>
       <div className="flex flex-col gap-4">
         {groups.map((g) => (
           <Card key={g.id}>
             <CardHeader className="flex flex-row items-start justify-between gap-3">
               <div>
                 <CardTitle className="text-base">{g.name}</CardTitle>
-                <p className="text-sm text-muted-foreground">{g.season.title}</p>
+                <p className="text-sm text-neutral-500">{g.season.title}</p>
               </div>
               <Link
                 href="/leader/calendar"
                 className="text-sm font-medium text-brand-teal-700 hover:underline"
               >
-                Calendar â†’
+                Calendar →
               </Link>
             </CardHeader>
             <CardContent>
               {g.students.length === 0 ? (
-                <p className="text-sm italic text-muted-foreground">No students yet.</p>
+                <p className="text-sm italic text-neutral-500">No students yet.</p>
               ) : (
                 <ul className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
                   {g.students.map((s) => (
@@ -86,6 +88,6 @@ export default async function LeaderGroupsPage() {
           </Card>
         ))}
       </div>
-    </>
+    </div>
   );
 }

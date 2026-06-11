@@ -11,9 +11,9 @@ function Card({ className, interactive, ...props }: CardProps) {
     <div
       data-slot="card"
       className={cn(
-        "rounded-2xl border border-border/60 bg-card text-card-foreground shadow-[var(--shadow-soft)] transition-[transform,box-shadow,border-color] duration-200 ease-[var(--ease-out-soft)]",
+        "rounded-xl bg-white shadow-[0_1px_3px_rgba(0,0,0,0.05),0_4px_12px_rgba(0,0,0,0.04)] ring-1 ring-neutral-200/60 transition-[transform,box-shadow] duration-200",
         interactive &&
-          "cursor-pointer hover:-translate-y-0.5 hover:shadow-[var(--shadow-pop)] hover:border-border",
+          "cursor-pointer hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(0,0,0,0.10)] hover:ring-neutral-300",
         className,
       )}
       {...props}
@@ -48,7 +48,7 @@ function CardDescription({ className, ...props }: React.ComponentProps<"p">) {
   return (
     <p
       data-slot="card-description"
-      className={cn("text-sm text-muted-foreground", className)}
+      className={cn("text-sm text-neutral-500", className)}
       {...props}
     />
   );
@@ -69,7 +69,7 @@ function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="card-footer"
       className={cn(
-        "flex items-center gap-2 border-t border-border/60 p-4 md:p-6",
+        "flex items-center gap-2 border-t border-neutral-100 p-4 md:p-6",
         className,
       )}
       {...props}

@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Menu as MenuPrimitive } from "@base-ui/react/menu";
-import { Camera, LogOut } from "lucide-react";
+import { Camera, LogOut, User } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +18,10 @@ const roleColor: Record<UserRole, RoleColor> = {
   LEADER: "leader",
   MENTOR: "mentor",
   STUDENT: "student",
+};
+
+const ROLE_PROFILE_HREF: Partial<Record<UserRole, string>> = {
+  STUDENT: "/student/profile",
 };
 
 interface UserMenuProps {
@@ -87,6 +91,22 @@ function UserMenu({ role, userId, initials, avatarUrl, signOutAction }: UserMenu
               </Badge>
             </div>
             <MenuPrimitive.Separator className="my-1 h-px bg-border" />
+            {ROLE_PROFILE_HREF[role] && (
+              <MenuPrimitive.Item
+                render={
+                  <button
+                    type="button"
+                    className={cn(
+                      "flex w-full cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground"
+                    )}
+                    onClick={() => router.push(ROLE_PROFILE_HREF[role]!)}
+                  />
+                }
+              >
+                <User className="size-4" />
+                My profile
+              </MenuPrimitive.Item>
+            )}
             <MenuPrimitive.Item
               render={
                 <button

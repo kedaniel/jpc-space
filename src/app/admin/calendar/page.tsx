@@ -3,33 +3,39 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole } from "@/lib/auth/permissions";
-import { PageHeader } from "@/components/layout/page-header";
 
 export const metadata = { title: "Calendar" };
 
 export default async function AdminCalendarRedirectPage() {
   const user = await getCurrentUserOrRedirect();
-  requireRole(user, ["ADMIN"]);
+  requireRole(user, ["ADMIN", "SUPER"]);
 
-  if (user.seasonAdminIds.length === 0) {
-    return (
-      <>
-        <PageHeader title="Calendar" description="You aren't assigned to a season yet." />
-      </>
-    );
-  }
+  const seasonIds =
+    user.role === "ADMIN" ? user.seasonAdminIds : undefined;
 
-  const season = await db.season.findFirst({
-    where: { id: { in: user.seasonAdminIds }, deletedAt: null },
-    orderBy: { startDate: "desc" },
-    select: { code: true },
-  });
+  // Prefer the most recent ACTIVE season; fall back to any non-deleted season
+  const season =
+    (await db.season.findFirst({
+      where: { ...(seasonIds ? { id: { in: seasonIds } } : {}), deletedAt: null, status: "ACTIVE" },
+      orderBy: { startDate: "desc" },
+      select: { code: true },
+    })) ??
+    (await db.season.findFirst({
+      where: { ...(seasonIds ? { id: { in: seasonIds } } : {}), deletedAt: null },
+      orderBy: { startDate: "desc" },
+      select: { code: true },
+    }));
+
   if (!season) {
     return (
-      <>
-        <PageHeader title="Calendar" description="No active season found." />
-      </>
+      <div className="flex flex-col gap-4">
+        <div>
+          <h1 className="text-2xl font-black text-brand-navy-900">Calendar</h1>
+          <p className="mt-1 text-sm text-neutral-500">No active season found.</p>
+        </div>
+      </div>
     );
   }
+
   redirect(`/admin/season/${season.code}/calendar`);
 }

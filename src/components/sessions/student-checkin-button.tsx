@@ -67,7 +67,7 @@ export function StudentCheckinButton({ isCheckInOpen }: StudentCheckinButtonProp
         Check In
       </Button>
       {!isCheckInOpen && (
-        <p className="text-sm text-muted-foreground">Check-in hasn&apos;t opened yet</p>
+        <p className="text-sm text-neutral-500">Check-in hasn&apos;t opened yet</p>
       )}
 
       <Modal open={open} onOpenChange={setOpen}>

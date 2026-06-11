@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole } from "@/lib/auth/permissions";
-import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { UserForm } from "@/components/users/user-form";
 
@@ -24,11 +23,11 @@ export default async function EditUserPage({ params }: PageProps) {
   if (!target) notFound();
 
   return (
-    <>
-      <PageHeader
-        title={`Edit ${target.name ?? target.email}`}
-        description={target.email}
-      />
+    <div className="flex flex-col gap-4">
+      <div>
+        <h1 className="text-2xl font-black text-brand-navy-900">Edit {target.name ?? target.email}</h1>
+        <p className="mt-1 text-sm text-neutral-500">{target.email}</p>
+      </div>
       <Card>
         <CardContent className="pt-6">
           <UserForm
@@ -43,6 +42,6 @@ export default async function EditUserPage({ params }: PageProps) {
           />
         </CardContent>
       </Card>
-    </>
+    </div>
   );
 }

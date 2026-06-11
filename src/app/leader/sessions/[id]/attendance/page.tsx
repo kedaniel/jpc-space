@@ -4,7 +4,6 @@ import { format } from "date-fns";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole, canMarkAttendance } from "@/lib/auth/permissions";
 import { loadAttendanceRoster, loadSessionById } from "@/lib/sessions-query";
-import { PageHeader } from "@/components/layout/page-header";
 import { AttendanceForm } from "@/components/sessions/attendance-form";
 
 interface PageProps {
@@ -24,16 +23,16 @@ export default async function LeaderAttendancePage({ params }: PageProps) {
   const roster = await loadAttendanceRoster(session.id, user.groupLeaderIds);
 
   return (
-    <>
-      <PageHeader
-        title={`Attendance — ${session.title}`}
-        description={format(session.startsAt, "EEE, MMM d, yyyy · h:mm a")}
-      />
+    <div className="flex flex-col gap-4">
+      <div>
+        <h1 className="text-2xl font-black text-brand-navy-900">{`Attendance — ${session.title}`}</h1>
+        <p className="mt-1 text-sm text-neutral-500">{format(session.startsAt, "EEE, MMM d, yyyy · h:mm a")}</p>
+      </div>
       <AttendanceForm
         sessionId={session.id}
         roster={roster}
         returnHref="/leader/calendar"
       />
-    </>
+    </div>
   );
 }

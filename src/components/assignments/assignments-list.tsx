@@ -16,7 +16,7 @@ interface AssignmentsListProps {
 
 function dueBadge(dueAt: Date | null) {
   if (!dueAt) return <Badge variant="outline">No due date</Badge>;
-  if (isPast(dueAt)) return <Badge variant="warning">Past due</Badge>;
+  if (isPast(dueAt)) return <Badge variant="warning">Due {format(dueAt, "MMM d, yyyy")}</Badge>;
   return (
     <Badge variant="info">
       Due in {formatDistanceToNowStrict(dueAt)}

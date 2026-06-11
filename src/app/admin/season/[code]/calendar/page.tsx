@@ -7,7 +7,6 @@ import { requireRole, canEditSeason } from "@/lib/auth/permissions";
 import { loadSeasonByCode } from "@/lib/seasons-query";
 import { listSessionsForSeason } from "@/lib/sessions-query";
 import { listJpcEvents } from "@/lib/jpc-events-query";
-import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { SeasonCalendar } from "@/components/sessions/season-calendar";
 
@@ -35,17 +34,19 @@ export default async function AdminCalendarPage({ params }: PageProps) {
   ]);
 
   return (
-    <>
-      <PageHeader
-        title="Calendar"
-        description={`${sessions.length} session${sessions.length === 1 ? "" : "s"}`}
-        actions={<Button render={<Link href={createHref} />}>Add session</Button>}
-      />
+    <div className="flex flex-col gap-4">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-black text-brand-navy-900">Calendar</h1>
+          <p className="mt-1 text-sm text-neutral-500">{`${sessions.length} session${sessions.length === 1 ? "" : "s"}`}</p>
+        </div>
+        <Button render={<Link href={createHref} />}>Add session</Button>
+      </div>
       <SeasonCalendar
         sessions={sessions}
         jpcEvents={jpcEvents}
         sessionPathTemplate="/admin/season/{seasonCode}/sessions/{id}"
       />
-    </>
+    </div>
   );
 }

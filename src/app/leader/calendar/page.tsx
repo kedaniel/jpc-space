@@ -3,7 +3,6 @@ import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole } from "@/lib/auth/permissions";
 import { listSessionsForSeason } from "@/lib/sessions-query";
 import { listJpcEvents } from "@/lib/jpc-events-query";
-import { PageHeader } from "@/components/layout/page-header";
 import { SeasonCalendar } from "@/components/sessions/season-calendar";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Calendar } from "lucide-react";
@@ -16,14 +15,17 @@ export default async function LeaderCalendarPage() {
 
   if (user.groupLeaderIds.length === 0) {
     return (
-      <>
-        <PageHeader title="Calendar" description="You don't lead any groups yet." />
+      <div className="flex flex-col gap-4">
+        <div>
+          <h1 className="text-2xl font-black text-brand-navy-900">Calendar</h1>
+          <p className="mt-1 text-sm text-neutral-500">You don&apos;t lead any groups yet.</p>
+        </div>
         <EmptyState
           icon={Calendar}
           title="No calendar"
           description="An admin will add you to a group when you're ready."
         />
-      </>
+      </div>
     );
   }
 
@@ -41,16 +43,16 @@ export default async function LeaderCalendarPage() {
   ]);
 
   return (
-    <>
-      <PageHeader
-        title="Calendar"
-        description={`${allSessions.length} session${allSessions.length === 1 ? "" : "s"}`}
-      />
+    <div className="flex flex-col gap-4">
+      <div>
+        <h1 className="text-2xl font-black text-brand-navy-900">Calendar</h1>
+        <p className="mt-1 text-sm text-neutral-500">{`${allSessions.length} session${allSessions.length === 1 ? "" : "s"}`}</p>
+      </div>
       <SeasonCalendar
         sessions={allSessions}
         jpcEvents={jpcEvents}
         sessionPathTemplate="/leader/sessions/{id}"
       />
-    </>
+    </div>
   );
 }

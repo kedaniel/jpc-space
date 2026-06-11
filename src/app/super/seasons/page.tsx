@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole } from "@/lib/auth/permissions";
-import { PageHeader } from "@/components/layout/page-header";
 import {
   SeasonCreateButton,
   SeasonsList,
@@ -41,17 +40,19 @@ export default async function SuperSeasonsPage() {
   }));
 
   return (
-    <>
-      <PageHeader
-        title="Seasons"
-        description="Create and manage program seasons."
-        actions={<SeasonCreateButton />}
-      />
+    <div className="flex flex-col gap-4">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-black text-brand-navy-900">Seasons</h1>
+          <p className="mt-1 text-sm text-neutral-500">Create and manage program seasons.</p>
+        </div>
+        <SeasonCreateButton />
+      </div>
       <SeasonsList
         rows={rows}
         basePath="/super/seasons"
         emptyAction={<SeasonCreateButton />}
       />
-    </>
+    </div>
   );
 }

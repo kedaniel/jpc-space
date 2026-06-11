@@ -15,6 +15,7 @@ const badgeVariants = cva(
         warning: "bg-warning-100 text-warning-800",
         error: "bg-error-100 text-error-800",
         info: "bg-info-100 text-info-800",
+        teal: "bg-brand-teal-100 text-brand-teal-800 border-brand-teal-200",
       },
       role: {
         none: "",

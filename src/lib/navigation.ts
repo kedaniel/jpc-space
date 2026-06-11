@@ -16,6 +16,7 @@ export type NavIconName =
   | "season"
   | "students"
   | "notes"
+  | "quizzes"
   | "more"
   | "settings";
 
@@ -58,6 +59,7 @@ const ADMIN: RoleNav = {
     { href: "/admin/groups", label: "Groups", icon: "groups" },
     { href: "/admin/students", label: "Students", icon: "students" },
     { href: "/admin/assignments", label: "Assignments", icon: "assignments" },
+    { href: "/admin/quizzes", label: "Quizzes", icon: "quizzes" },
     { href: "/admin/reports", label: "Reports", icon: "reports" },
     { href: "/admin/settings", label: "Settings", icon: "settings" },
   ],
@@ -76,6 +78,7 @@ const LEADER: RoleNav = {
     { href: "/leader/groups", label: "My Groups", icon: "groups" },
     { href: "/leader/calendar", label: "Calendar", icon: "calendar" },
     { href: "/leader/submissions", label: "Submissions", icon: "submissions" },
+    { href: "/leader/quizzes", label: "Quizzes", icon: "quizzes" },
     { href: "/leader/settings", label: "Settings", icon: "settings" },
   ],
   tabs: [
@@ -93,6 +96,7 @@ const STUDENT: RoleNav = {
     { href: "/student/season", label: "Current Season", icon: "season" },
     { href: "/student/calendar", label: "Calendar", icon: "calendar" },
     { href: "/student/assignments", label: "Assignments", icon: "assignments" },
+    { href: "/student/quizzes", label: "Quizzes", icon: "quizzes" },
     { href: "/student/history", label: "History", icon: "history" },
     { href: "/student/profile", label: "Profile", icon: "profile" },
   ],
@@ -100,7 +104,7 @@ const STUDENT: RoleNav = {
     { href: "/student/dashboard", label: "Home", icon: "home" },
     { href: "/student/calendar", label: "Calendar", icon: "calendar" },
     { href: "/student/assignments", label: "Assignments", icon: "assignments" },
-    { href: "/student/history", label: "History", icon: "history" },
+    { href: "/student/quizzes", label: "Quizzes", icon: "quizzes" },
     { href: "/student/profile", label: "Profile", icon: "profile" },
   ],
 };

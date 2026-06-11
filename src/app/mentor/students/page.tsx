@@ -4,7 +4,6 @@ import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole } from "@/lib/auth/permissions";
 import { listStudentsForScope } from "@/lib/students-query";
 import { getStorage } from "@/lib/storage";
-import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { StudentsList } from "@/components/students/students-list";
 
@@ -28,12 +27,12 @@ export default async function MentorStudentsPage({
   );
 
   return (
-    <>
-      <PageHeader
-        title="Students"
-        description={`${rowsWithAvatars.length} student${rowsWithAvatars.length === 1 ? "" : "s"} · read-only`}
-      />
-      <form action="/mentor/students" method="get" className="mb-4 flex gap-2">
+    <div className="flex flex-col gap-4">
+      <div>
+        <h1 className="text-2xl font-black text-brand-navy-900">Students</h1>
+        <p className="mt-1 text-sm text-neutral-500">{`${rowsWithAvatars.length} student${rowsWithAvatars.length === 1 ? "" : "s"} · read-only`}</p>
+      </div>
+      <form action="/mentor/students" method="get" className="flex gap-2">
         <input
           type="search"
           name="q"
@@ -46,6 +45,6 @@ export default async function MentorStudentsPage({
         </Button>
       </form>
       <StudentsList rows={rowsWithAvatars} basePath="/mentor/students" />
-    </>
+    </div>
   );
 }

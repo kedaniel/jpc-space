@@ -6,7 +6,6 @@ import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole, canEditSeason } from "@/lib/auth/permissions";
 import { loadSeasonByCode } from "@/lib/seasons-query";
 import { listGroupsForSeason } from "@/lib/groups-query";
-import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { GroupsList } from "@/components/groups/groups-list";
 
@@ -30,17 +29,19 @@ export default async function AdminGroupsPage({ params }: PageProps) {
   const createHref = `/admin/season/${season.code}/groups/new`;
 
   return (
-    <>
-      <PageHeader
-        title="Groups"
-        description={`${groups.length} group${groups.length === 1 ? "" : "s"} in ${season.title}`}
-        actions={<Button render={<Link href={createHref} />}>New group</Button>}
-      />
+    <div className="flex flex-col gap-4">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-black text-brand-navy-900">Groups</h1>
+          <p className="mt-1 text-sm text-neutral-500">{`${groups.length} group${groups.length === 1 ? "" : "s"} in ${season.title}`}</p>
+        </div>
+        <Button render={<Link href={createHref} />}>New group</Button>
+      </div>
       <GroupsList
         rows={groups}
         basePath={`/admin/season/${season.code}/groups`}
         createHref={createHref}
       />
-    </>
+    </div>
   );
 }

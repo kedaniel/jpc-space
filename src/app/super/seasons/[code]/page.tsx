@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole } from "@/lib/auth/permissions";
 import { loadSeasonByCode } from "@/lib/seasons-query";
-import { PageHeader } from "@/components/layout/page-header";
 import { SeasonDetail } from "@/components/seasons/season-detail";
 
 interface PageProps {
@@ -22,8 +21,11 @@ export default async function SuperSeasonDetailPage({ params }: PageProps) {
   const season = await loadSeasonByCode(code);
 
   return (
-    <>
-      <PageHeader title={season.title} description={`Code: ${season.code}`} />
+    <div className="flex flex-col gap-4">
+      <div>
+        <h1 className="text-2xl font-black text-brand-navy-900">{season.title}</h1>
+        <p className="mt-1 text-sm text-neutral-500">Code: {season.code}</p>
+      </div>
       <SeasonDetail
         season={season}
         canEdit
@@ -31,6 +33,6 @@ export default async function SuperSeasonDetailPage({ params }: PageProps) {
         groupsHref={`/super/seasons/${season.code}/groups`}
         calendarHref="/super/calendar"
       />
-    </>
+    </div>
   );
 }

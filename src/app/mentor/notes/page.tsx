@@ -5,7 +5,6 @@ import { Flag } from "lucide-react";
 import { db } from "@/lib/db";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole } from "@/lib/auth/permissions";
-import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -50,11 +49,11 @@ export default async function MentorNotesPage({
   ]);
 
   return (
-    <>
-      <PageHeader
-        title="My notes"
-        description={`${notes.length} note${notes.length === 1 ? "" : "s"} you've authored`}
-      />
+    <div className="flex flex-col gap-4">
+      <div>
+        <h1 className="text-2xl font-black text-brand-navy-900">My notes</h1>
+        <p className="mt-1 text-sm text-neutral-500">{`${notes.length} note${notes.length === 1 ? "" : "s"} you've authored`}</p>
+      </div>
 
       <div className="mb-4">
         <MentorNoteComposer students={students} />
@@ -75,7 +74,7 @@ export default async function MentorNotesPage({
         </select>
         <button
           type="submit"
-          className="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium hover:bg-muted"
+          className="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium hover:bg-neutral-50"
         >
           Filter
         </button>
@@ -93,7 +92,7 @@ export default async function MentorNotesPage({
             <li key={n.id}>
               <Card>
                 <CardContent className="flex flex-col gap-2 pt-4">
-                  <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                  <div className="flex flex-wrap items-center gap-2 text-xs text-neutral-500">
                     <Link
                       href={`/mentor/students/${n.studentUser.id}`}
                       className="font-medium text-foreground hover:underline"
@@ -127,6 +126,6 @@ export default async function MentorNotesPage({
           ))}
         </ul>
       )}
-    </>
+    </div>
   );
 }
