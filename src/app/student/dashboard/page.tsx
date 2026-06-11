@@ -132,79 +132,74 @@ export default async function StudentDashboard() {
 
       {/* ── Active season ── */}
       {season && (
-        <>
-          {/* Hero progress card */}
-          <div className="rounded-xl bg-gradient-to-br from-brand-navy-900 to-brand-navy-700 p-4 shadow-[0_4px_20px_rgba(31,50,96,0.25)]">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-brand-teal-300">
-              Season progress
-            </p>
-            <div className="mt-2">
-              <p className="text-3xl font-black text-white">{progressPct}%</p>
-              <p className="text-xs text-white/50">
-                Week {weeksCompleted} of {weeksTotal}
-              </p>
-            </div>
-            <Progress
-              value={progressPct}
-              className="mt-3 h-1.5 bg-white/10 [&>div]:bg-gradient-to-r [&>div]:from-brand-teal-400 [&>div]:to-brand-teal-300"
-            />
-          </div>
-
-          {/* Stat row */}
-          <div className="grid grid-cols-3 gap-3">
-            <StatCard
-              label="Absence budget"
-              value={attendancePct !== null ? `${attendancePct}%` : "—"}
-              sublabel="this season"
-              href="/student/attendance"
-            />
-            <StatCard
-              label="Streak"
-              value={streak > 0 ? `🔥 ${streak}` : streak}
-            />
-            <StatCard
-              label="Assignments"
-              value={pending.length}
-              sublabel={pending.length === 1 ? "pending" : "pending"}
-              href="/student/assignments"
-              variant={pending.length > 0 ? "teal" : "white"}
-            />
-          </div>
-          {lateCount > 0 && (
-            <div className="rounded-xl bg-warning-50 p-3 ring-1 ring-warning-200">
-              <p className="text-xs font-bold text-warning-800">
-                ⚠ {lateCount} assignment{lateCount !== 1 ? "s" : ""} submitted late this season
-              </p>
-            </div>
+        <StaggerReveal className="flex flex-col gap-4 md:gap-6">
+          {engagement && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Your progress</CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-3">
+                {budget && (
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-3">
+                      <Progress
+                        value={budget.budgetPct}
+                        className={[
+                          "flex-1",
+                          budget.budgetPct >= 80
+                            ? "[&>div]:bg-error-500"
+                            : budget.budgetPct >= 50
+                              ? "[&>div]:bg-warning-500"
+                              : "",
+                        ].join(" ")}
+                      />
+                      <span
+                        className={[
+                          "text-sm font-semibold tabular-nums",
+                          budget.budgetPct >= 80
+                            ? "text-error-700 dark:text-error-400"
+                            : budget.budgetPct >= 50
+                              ? "text-warning-700 dark:text-warning-400"
+                              : "text-muted-foreground",
+                        ].join(" ")}
+                      >
+                        {budget.minutesUsed}/{budget.budgetMinutes} min
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Absence budget used ({budget.absentCount} absent,{" "}
+                      {budget.lateCount} late)
+                    </p>
+                  </div>
+                )}
+                <p className="text-xs text-muted-foreground">
+                  Week {weeksCompleted} of {weeksTotal} ·{" "}
+                  {engagement.submissionsCompleted}/{engagement.submissionsExpected}{" "}
+                  assignments submitted
+                </p>
+              </CardContent>
+            </Card>
           )}
 
-          {/* Next session */}
-          <div className="rounded-xl bg-white p-4 shadow-[0_1px_3px_rgba(0,0,0,0.05),0_4px_12px_rgba(0,0,0,0.04)] ring-1 ring-neutral-200/60">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">
-              Next session
-            </p>
-            {nextSession ? (
-              <div className="mt-2 flex flex-col gap-2">
-                <div className="flex items-start gap-3">
-                  <span className="mt-1 size-2 shrink-0 rounded-full bg-brand-teal-500" />
-                  <div>
-                    <Link
-                      href={`/student/sessions/${nextSession.id}`}
-                      className="text-sm font-bold text-brand-navy-900 hover:underline"
-                    >
-                      {nextSession.title}
-                    </Link>
-                    <p className="text-xs text-neutral-500">
-                      {format(nextSession.startsAt, "EEE, MMM d · h:mm a")} ·{" "}
-                      {nextSession.durationMinutes} min
-                      {nextSession.location ? ` · ${nextSession.location}` : ""}
-                    </p>
-                    <Badge variant="teal" className="mt-1.5 text-[10px]">
-                      {formatDistanceToNowStrict(nextSession.startsAt, {
-                        addSuffix: true,
-                      })}
-                    </Badge>
-                  </div>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="text-base">Next session</CardTitle>
+              <Button variant="ghost" size="sm" render={<Link href="/student/calendar" />}>
+                See calendar
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {nextSession ? (
+                <div className="flex flex-col gap-1">
+                  <p className="font-medium">{nextSession.title}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {format(nextSession.startsAt, "EEE, MMM d · h:mm a")} ·{" "}
+                    {nextSession.durationMinutes} min
+                    {nextSession.location ? ` · ${nextSession.location}` : ""}
+                  </p>
+                  <p className="text-xs text-info-700">
+                    Starts {formatDistanceToNowStrict(nextSession.startsAt, { addSuffix: true })}
+                  </p>
                 </div>
                 {nextSession.youtubeUrl && (
                   <a
@@ -224,12 +219,17 @@ export default async function StudentDashboard() {
             )}
           </div>
 
-          {/* Due soon */}
-          {pending.length > 0 && (
-            <div className="rounded-xl bg-white p-4 shadow-[0_1px_3px_rgba(0,0,0,0.05),0_4px_12px_rgba(0,0,0,0.04)] ring-1 ring-neutral-200/60">
-              <div className="flex items-center justify-between">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">
-                  Due soon
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="text-base">Pending assignments</CardTitle>
+              <Button variant="ghost" size="sm" render={<Link href="/student/assignments" />}>
+                See all
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {pending.length === 0 ? (
+                <p className="text-sm italic text-muted-foreground">
+                  Nothing pending — great job staying on top of it.
                 </p>
                 <Link
                   href="/student/assignments"

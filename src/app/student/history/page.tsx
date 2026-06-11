@@ -105,18 +105,22 @@ export default async function StudentHistoryPage() {
 
           return (
             <li key={e.seasonId}>
-              <div className="rounded-xl bg-white p-4 shadow-[0_1px_3px_rgba(0,0,0,0.05),0_4px_12px_rgba(0,0,0,0.04)] ring-1 ring-neutral-200/60">
-                {/* Season title row */}
-                <div className="flex flex-wrap items-start justify-between gap-2">
-                  <div>
-                    <p className="text-base font-bold text-brand-navy-900">
-                      {e.season.title}
-                    </p>
-                    <p className="text-xs text-neutral-500">
-                      {format(e.season.startDate, "MMM d, yyyy")} –{" "}
-                      {format(e.season.endDate, "MMM d, yyyy")}
-                      {e.group?.name && ` · ${e.group.name}`}
-                    </p>
+              <Card>
+                <CardHeader>
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <div>
+                      <CardTitle className="text-base">{e.season.title}</CardTitle>
+                      <p className="text-xs text-muted-foreground">
+                        {format(e.season.startDate, "MMM d, yyyy")} –{" "}
+                        {format(e.season.endDate, "MMM d, yyyy")}
+                        {e.group?.name && ` · ${e.group.name}`}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      <Badge variant="outline">{e.season.status}</Badge>
+                      <Badge variant="success">Participated</Badge>
+                      <Badge variant="info">{attendancePct}% attendance</Badge>
+                    </div>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     <Badge variant="teal">{attendancePct}% attended</Badge>

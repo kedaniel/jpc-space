@@ -79,22 +79,17 @@ export default async function StudentSeasonPage() {
   });
 
   return (
-    <div className="flex flex-col gap-3 md:gap-4">
-      {/* Navy hero card */}
-      <div className="rounded-xl bg-gradient-to-br from-brand-navy-900 to-brand-navy-700 p-4 shadow-[0_4px_20px_rgba(31,50,96,0.25)]">
-        <h1 className="text-xl font-black text-white">{season.title}</h1>
-        <p className="mt-1 text-sm text-white/60">
-          {format(season.startDate, "MMM d, yyyy")} –{" "}
-          {format(season.endDate, "MMM d, yyyy")}
-        </p>
-        <div className="mt-2 flex flex-wrap gap-1.5">
-          <Badge variant="teal">{season.status}</Badge>
-          {membership?.group && (
-            <Badge className="border-white/20 bg-white/10 text-white">
-              {membership.group.name}
-            </Badge>
-          )}
-        </div>
+    <>
+      <PageHeader
+        title={season.title}
+        description={`${format(season.startDate, "MMM d, yyyy")} – ${format(season.endDate, "MMM d, yyyy")}`}
+      />
+
+      <div className="mb-4 flex flex-wrap gap-2">
+        <Badge variant="outline">{season.status}</Badge>
+        {membership?.group && (
+          <Badge variant="secondary">{membership.group.name}</Badge>
+        )}
       </div>
 
       {/* Description */}
@@ -160,22 +155,18 @@ export default async function StudentSeasonPage() {
           >
             See calendar
           </Button>
-        </div>
-        {upcomingSessions.length === 0 ? (
-          <p className="text-sm italic text-neutral-400">
-            No upcoming sessions.
-          </p>
-        ) : (
-          <ul className="flex flex-col divide-y divide-neutral-100">
-            {upcomingSessions.map((s) => (
-              <li
-                key={s.id}
-                className="flex items-start gap-3 py-2 first:pt-0 last:pb-0"
-              >
-                <span className="mt-1.5 size-2 shrink-0 rounded-full bg-brand-teal-500" />
-                <div>
-                  <p className="text-sm font-semibold text-brand-navy-900">
-                    {s.title}
+        </CardHeader>
+        <CardContent>
+          {upcomingSessions.length === 0 ? (
+            <p className="text-sm italic text-muted-foreground">No upcoming sessions.</p>
+          ) : (
+            <ul className="flex flex-col divide-y divide-border">
+              {upcomingSessions.map((s) => (
+                <li key={s.id} className="py-2 first:pt-0 last:pb-0">
+                  <p className="text-sm font-medium">{s.title}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {format(s.startsAt, "EEE, MMM d · h:mm a")}
+                    {s.location && ` · ${s.location}`}
                   </p>
                   <p className="text-xs text-neutral-500">
                     {format(s.startsAt, "EEE, MMM d · h:mm a")}
