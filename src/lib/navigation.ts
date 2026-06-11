@@ -59,6 +59,7 @@ const ADMIN: RoleNav = {
     { href: "/admin/groups", label: "Groups", icon: "groups" },
     { href: "/admin/students", label: "Students", icon: "students" },
     { href: "/admin/assignments", label: "Assignments", icon: "assignments" },
+    { href: "/admin/quizzes", label: "Quizzes", icon: "quizzes" },
     { href: "/admin/reports", label: "Reports", icon: "reports" },
     { href: "/admin/settings", label: "Settings", icon: "settings" },
   ],
