@@ -156,7 +156,7 @@ export default async function StudentDashboard() {
               label="Attendance"
               value={attendancePct !== null ? `${attendancePct}%` : "—"}
               sublabel="this season"
-              href="/student/calendar"
+              href="/student/attendance"
             />
             <StatCard
               label="Streak"

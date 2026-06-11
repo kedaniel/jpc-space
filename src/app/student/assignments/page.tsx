@@ -36,7 +36,7 @@ function StatusBadge({
   if (status === "DRAFT")
     return <Badge variant="warning">Draft</Badge>;
   if (dueAt && isPast(dueAt))
-    return <Badge variant="error">Past due</Badge>;
+    return <Badge variant="error">Due {format(dueAt, "MMM d")}</Badge>;
   return <Badge variant="outline">Not started</Badge>;
 }
 
@@ -98,8 +98,7 @@ export default async function StudentAssignmentsPage() {
                     </Link>
                     {r.dueAt && (
                       <p className="text-xs text-neutral-500">
-                        {isPast(r.dueAt) ? "Was due" : "Due"}{" "}
-                        {format(r.dueAt, "MMM d, yyyy")}
+                        Due {format(r.dueAt, "MMM d, yyyy")}
                         {!isPast(r.dueAt) &&
                           ` · in ${formatDistanceToNowStrict(r.dueAt)}`}
                       </p>
