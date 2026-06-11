@@ -153,7 +153,7 @@ export default async function StudentDashboard() {
           {/* Stat row */}
           <div className="grid grid-cols-3 gap-3">
             <StatCard
-              label="Attendance"
+              label="Absence budget"
               value={attendancePct !== null ? `${attendancePct}%` : "—"}
               sublabel="this season"
               href="/student/attendance"

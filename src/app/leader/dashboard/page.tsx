@@ -222,6 +222,12 @@ export default async function LeaderDashboard() {
             />
           </div>
         ) : (
+          <>
+          <div className="grid grid-cols-[1fr_auto_auto] gap-3 border-b border-neutral-100 px-4 py-2">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">Student</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">Attendance</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">Assignments</p>
+          </div>
           <ul className="divide-y divide-neutral-100">
             {studentRows.map((s) => (
               <li key={s.id}>
@@ -256,6 +262,7 @@ export default async function LeaderDashboard() {
               </li>
             ))}
           </ul>
+          </>
         )}
       </div>
 
