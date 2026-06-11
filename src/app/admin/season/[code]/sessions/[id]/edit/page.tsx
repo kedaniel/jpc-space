@@ -41,6 +41,7 @@ export default async function EditSessionPage({ params }: PageProps) {
               startsAt: session.startsAt,
               durationMinutes: session.durationMinutes,
               location: session.location,
+              youtubeUrl: session.youtubeUrl,
               description: session.description,
             }}
           />

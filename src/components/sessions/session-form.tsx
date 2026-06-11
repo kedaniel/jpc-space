@@ -36,6 +36,7 @@ const schema = z.object({
   }),
   durationMinutes: z.number().int().min(15).max(600),
   location: z.string().max(200).optional(),
+  youtubeUrl: z.string().url("Must be a valid URL.").or(z.literal("")).optional(),
   description: z.string().max(2000).optional(),
   repeatWeeks: z.number().int().min(1).max(26),
   scope: z.enum(["one", "future", "all"]),
@@ -60,6 +61,7 @@ export interface SessionFormProps {
     startsAt: Date;
     durationMinutes: number;
     location: string | null;
+    youtubeUrl: string | null;
     description: string | null;
   };
 }
@@ -92,6 +94,7 @@ export function SessionForm({
         : { hour: 18, minute: 0 },
       durationMinutes: defaultValues?.durationMinutes ?? 90,
       location: defaultValues?.location ?? "",
+      youtubeUrl: defaultValues?.youtubeUrl ?? "",
       description: defaultValues?.description ?? "",
       repeatWeeks: 1,
       scope: "one",
@@ -108,6 +111,7 @@ export function SessionForm({
           startsAt,
           durationMinutes: values.durationMinutes,
           location: values.location || null,
+          youtubeUrl: values.youtubeUrl || null,
           description: values.description || null,
           repeatWeeks: values.repeatWeeks,
         };
@@ -120,6 +124,7 @@ export function SessionForm({
           startsAt,
           durationMinutes: values.durationMinutes,
           location: values.location || null,
+          youtubeUrl: values.youtubeUrl || null,
           description: values.description || null,
           scope: values.scope as RecurrenceScope,
         };
@@ -184,7 +189,19 @@ export function SessionForm({
       </div>
 
       <FormField label="Location" error={errors.location?.message}>
-        <Input {...register("location")} placeholder="Room, link, or address" />
+        <Input {...register("location")} placeholder="Room or address (leave blank for online sessions)" />
+      </FormField>
+
+      <FormField
+        label="YouTube link"
+        description="For online sessions — students see 'Join session' before it starts and 'Watch recording' after."
+        error={errors.youtubeUrl?.message}
+      >
+        <Input
+          {...register("youtubeUrl")}
+          type="url"
+          placeholder="https://youtube.com/live/..."
+        />
       </FormField>
 
       <FormField label="Description" error={errors.description?.message}>

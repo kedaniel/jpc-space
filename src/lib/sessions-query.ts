@@ -95,6 +95,7 @@ export interface SessionDetailData {
   startsAt: Date;
   durationMinutes: number;
   location: string | null;
+  youtubeUrl: string | null;
   recurrenceGroupId: string | null;
   seasonId: number;
   seasonCode: string;
@@ -114,6 +115,7 @@ export async function loadSessionById(id: number): Promise<SessionDetailData> {
       startsAt: true,
       durationMinutes: true,
       location: true,
+      youtubeUrl: true,
       recurrenceGroupId: true,
       seasonId: true,
       season: { select: { code: true, title: true } },
@@ -130,6 +132,7 @@ export async function loadSessionById(id: number): Promise<SessionDetailData> {
     startsAt: s.startsAt,
     durationMinutes: s.durationMinutes,
     location: s.location,
+    youtubeUrl: s.youtubeUrl,
     recurrenceGroupId: s.recurrenceGroupId,
     seasonId: s.seasonId,
     seasonCode: s.season.code,

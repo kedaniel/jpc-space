@@ -307,6 +307,7 @@ model Session {
   startsAt          DateTime
   durationMinutes   Int       @default(90)
   location          String?
+  youtubeUrl        String?
   description       String?
   materialsPath     String?
   // Sibling sessions created in the same recurrence batch share this id.
