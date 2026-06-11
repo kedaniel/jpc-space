@@ -210,7 +210,7 @@ export default async function StudentDashboard() {
                     rel="noopener noreferrer"
                     className="flex items-center justify-center gap-1.5 rounded-lg bg-brand-teal-600 px-3 py-2 text-xs font-bold text-white transition-colors hover:bg-brand-teal-700"
                   >
-                    {isPast(nextSession.startsAt) ? "Watch recording" : "Join session"}
+                    Watch recording
                   </a>
                 )}
               </div>

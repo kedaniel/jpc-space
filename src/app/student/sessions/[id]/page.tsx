@@ -38,7 +38,6 @@ export default async function StudentSessionPage({ params }: PageProps) {
   const endsAt = new Date(
     session.startsAt.getTime() + session.durationMinutes * 60 * 1000,
   );
-  const isPast = session.startsAt.getTime() < now;
   const isOnline = Boolean(session.youtubeUrl);
 
   return (
@@ -74,7 +73,7 @@ export default async function StudentSessionPage({ params }: PageProps) {
           className="flex items-center justify-center gap-2 rounded-xl bg-brand-teal-600 px-4 py-3 text-sm font-bold text-white shadow-[0_2px_8px_rgba(93,185,188,0.35)] transition-colors hover:bg-brand-teal-700"
         >
           <Video className="size-4 shrink-0" />
-          {isPast ? "Watch recording" : "Join session"}
+          Watch recording
         </a>
       )}
 
