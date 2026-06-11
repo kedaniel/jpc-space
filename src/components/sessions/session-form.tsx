@@ -35,6 +35,7 @@ const schema = z.object({
     minute: z.number().int().min(0).max(59),
   }),
   durationMinutes: z.number().int().min(15).max(600),
+  sessionType: z.enum(["inperson", "online"]),
   location: z.string().max(200).optional(),
   youtubeUrl: z.string().url("Must be a valid URL.").or(z.literal("")).optional(),
   description: z.string().max(2000).optional(),
@@ -81,6 +82,7 @@ export function SessionForm({
   const {
     control,
     register,
+    watch,
     handleSubmit,
     setError,
     formState: { errors },
@@ -93,6 +95,7 @@ export function SessionForm({
         ? { hour: defaultValues.startsAt.getHours(), minute: defaultValues.startsAt.getMinutes() }
         : { hour: 18, minute: 0 },
       durationMinutes: defaultValues?.durationMinutes ?? 90,
+      sessionType: defaultValues?.youtubeUrl ? "online" : "inperson",
       location: defaultValues?.location ?? "",
       youtubeUrl: defaultValues?.youtubeUrl ?? "",
       description: defaultValues?.description ?? "",
@@ -100,6 +103,8 @@ export function SessionForm({
       scope: "one",
     },
   });
+
+  const sessionType = watch("sessionType");
 
   const onSubmit = handleSubmit((values) => {
     setSubmitError(null);
@@ -110,8 +115,8 @@ export function SessionForm({
           title: values.title,
           startsAt,
           durationMinutes: values.durationMinutes,
-          location: values.location || null,
-          youtubeUrl: values.youtubeUrl || null,
+          location: values.sessionType === "inperson" ? (values.location || null) : null,
+          youtubeUrl: values.sessionType === "online" ? (values.youtubeUrl || null) : null,
           description: values.description || null,
           repeatWeeks: values.repeatWeeks,
         };
@@ -123,8 +128,8 @@ export function SessionForm({
           title: values.title,
           startsAt,
           durationMinutes: values.durationMinutes,
-          location: values.location || null,
-          youtubeUrl: values.youtubeUrl || null,
+          location: values.sessionType === "inperson" ? (values.location || null) : null,
+          youtubeUrl: values.sessionType === "online" ? (values.youtubeUrl || null) : null,
           description: values.description || null,
           scope: values.scope as RecurrenceScope,
         };
@@ -188,21 +193,46 @@ export function SessionForm({
         </FormField>
       </div>
 
-      <FormField label="Location" error={errors.location?.message}>
-        <Input {...register("location")} placeholder="Room or address (leave blank for online sessions)" />
-      </FormField>
-
-      <FormField
-        label="YouTube link"
-        description="For online sessions — students see 'Join session' before it starts and 'Watch recording' after."
-        error={errors.youtubeUrl?.message}
-      >
-        <Input
-          {...register("youtubeUrl")}
-          type="url"
-          placeholder="https://youtube.com/live/..."
+      <FormField label="Session type" error={errors.sessionType?.message}>
+        <Controller
+          control={control}
+          name="sessionType"
+          render={({ field }) => (
+            <div className="flex gap-2">
+              {(["inperson", "online"] as const).map((type) => (
+                <button
+                  key={type}
+                  type="button"
+                  onClick={() => field.onChange(type)}
+                  className={`flex-1 rounded-lg border px-3 py-2 text-sm font-semibold transition-colors ${
+                    field.value === type
+                      ? "border-brand-teal-500 bg-brand-teal-50 text-brand-teal-800"
+                      : "border-neutral-200 bg-white text-neutral-500 hover:border-neutral-300"
+                  }`}
+                >
+                  {type === "inperson" ? "In-person" : "Online"}
+                </button>
+              ))}
+            </div>
+          )}
         />
       </FormField>
+
+      {sessionType === "inperson" && (
+        <FormField label="Location" error={errors.location?.message}>
+          <Input {...register("location")} placeholder="Room, building, or address" />
+        </FormField>
+      )}
+
+      {sessionType === "online" && (
+        <FormField label="YouTube link" error={errors.youtubeUrl?.message}>
+          <Input
+            {...register("youtubeUrl")}
+            type="url"
+            placeholder="https://youtube.com/watch?v=..."
+          />
+        </FormField>
+      )}
 
       <FormField label="Description" error={errors.description?.message}>
         <Textarea
