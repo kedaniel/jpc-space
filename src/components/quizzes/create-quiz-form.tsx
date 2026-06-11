@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { createQuizAction } from "@/lib/quiz-actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,13 +13,14 @@ interface Props {
 }
 
 export function CreateQuizForm({ sessionId, seasonId, onCreated }: Props) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [maxScore, setMaxScore] = useState("100");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
     const score = parseInt(maxScore, 10);
@@ -35,6 +37,7 @@ export function CreateQuizForm({ sessionId, seasonId, onCreated }: Props) {
         setMaxScore("100");
         setOpen(false);
         onCreated?.();
+        router.refresh();
       }
     });
   }

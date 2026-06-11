@@ -29,6 +29,11 @@ export async function createQuizAction(
   const parsed = createQuizSchema.safeParse({ sessionId, seasonId, title, maxScore });
   if (!parsed.success) return { error: parsed.error.issues[0].message };
 
+  const season = await db.season.findUnique({
+    where: { id: parsed.data.seasonId },
+    select: { code: true },
+  });
+
   await db.quiz.create({
     data: {
       sessionId: parsed.data.sessionId,
@@ -39,7 +44,11 @@ export async function createQuizAction(
     },
   });
 
-  revalidatePath(`/admin/season`);
+  if (season) {
+    revalidatePath(`/admin/season/${season.code}/sessions/${parsed.data.sessionId}`);
+    revalidatePath(`/admin/season/${season.code}`);
+  }
+  revalidatePath(`/admin/quizzes`);
   revalidatePath(`/leader/sessions/${parsed.data.sessionId}`);
   revalidatePath(`/leader/quizzes`);
   return {};
