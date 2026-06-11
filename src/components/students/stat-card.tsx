@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 interface StatCardProps {
   label: string;
   value: React.ReactNode;
+  sublabel?: string;
   variant?: "white" | "navy" | "teal";
   className?: string;
 }
@@ -10,6 +11,7 @@ interface StatCardProps {
 export function StatCard({
   label,
   value,
+  sublabel,
   variant = "white",
   className,
 }: StatCardProps) {
@@ -46,6 +48,18 @@ export function StatCard({
       >
         {value}
       </p>
+      {sublabel && (
+        <p
+          className={cn(
+            "mt-0.5 text-[10px]",
+            variant === "white" && "text-neutral-400",
+            variant === "navy" && "text-white/40",
+            variant === "teal" && "text-brand-teal-600",
+          )}
+        >
+          {sublabel}
+        </p>
+      )}
     </div>
   );
 }

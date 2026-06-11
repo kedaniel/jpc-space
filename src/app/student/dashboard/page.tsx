@@ -138,22 +138,11 @@ export default async function StudentDashboard() {
             <p className="text-[10px] font-bold uppercase tracking-widest text-brand-teal-300">
               Season progress
             </p>
-            <div className="mt-2 flex items-end justify-between gap-4">
-              <div>
-                <p className="text-3xl font-black text-white">{progressPct}%</p>
-                <p className="text-xs text-white/50">
-                  Week {weeksCompleted} of {weeksTotal}
-                </p>
-              </div>
-              <div className="text-right">
-                <p className="text-xl font-black text-white">
-                  {engagement?.submissionsCompleted ?? 0}
-                  <span className="text-sm font-semibold text-white/40">
-                    /{engagement?.submissionsExpected ?? 0}
-                  </span>
-                </p>
-                <p className="text-xs text-white/50">assignments</p>
-              </div>
+            <div className="mt-2">
+              <p className="text-3xl font-black text-white">{progressPct}%</p>
+              <p className="text-xs text-white/50">
+                Week {weeksCompleted} of {weeksTotal}
+              </p>
             </div>
             <Progress
               value={progressPct}
@@ -174,6 +163,7 @@ export default async function StudentDashboard() {
             <StatCard
               label="Pending"
               value={pending.length}
+              sublabel="assignments"
               variant={pending.length > 0 ? "teal" : "white"}
             />
           </div>
