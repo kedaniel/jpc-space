@@ -15,6 +15,7 @@ import {
   LayoutDashboard,
   MoreHorizontal,
   Notebook,
+  PenLine,
   Settings,
   Sparkles,
   User,
@@ -41,6 +42,7 @@ const iconMap: Record<NavIconName, LucideIcon> = {
   season: Sparkles,
   students: GraduationCap,
   notes: Notebook,
+  quizzes: PenLine,
   more: MoreHorizontal,
   settings: Settings,
 };

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { AlertTriangle, ClipboardList } from "lucide-react";
+import { AlertTriangle, ClipboardList, PenLine } from "lucide-react";
 
 import { db } from "@/lib/db";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
@@ -28,7 +28,7 @@ export default async function LeaderDashboard() {
   const seasonId = groups[0]?.seasonId ?? null;
   const studentIds = groups.flatMap((g) => g.students.map((s) => s.studentUserId));
 
-  const [atRisk, submissions] = await Promise.all([
+  const [atRisk, submissions, quizzes] = await Promise.all([
     seasonId && studentIds.length
       ? computeAtRiskStudents(seasonId, studentIds)
       : Promise.resolve([]),
@@ -41,6 +41,21 @@ export default async function LeaderDashboard() {
           select: { status: true },
         })
       : Promise.resolve([]),
+    seasonId
+      ? db.quiz.findMany({
+          where: { seasonId },
+          select: {
+            id: true,
+            title: true,
+            sessionId: true,
+            grades: {
+              where: studentIds.length ? { studentUserId: { in: studentIds } } : undefined,
+              select: { score: true },
+            },
+            _count: { select: { grades: true } },
+          },
+        })
+      : Promise.resolve([]),
   ]);
 
   const pendingReview = submissions.filter((s) => s.status === "SUBMITTED").length;
@@ -48,6 +63,11 @@ export default async function LeaderDashboard() {
     (s) => s.status === "REVIEWED" || s.status === "RETURNED",
   ).length;
   const drafts = submissions.filter((s) => s.status === "DRAFT").length;
+
+  const quizzesGraded = quizzes.filter(
+    (q) => q.grades.filter((g) => g.score !== null).length >= studentIds.length && studentIds.length > 0,
+  ).length;
+  const quizzesPending = quizzes.length - quizzesGraded;
 
   return (
     <div className="flex flex-col gap-4">
@@ -83,6 +103,35 @@ export default async function LeaderDashboard() {
           ))}
         </div>
       </div>
+
+      {/* Quiz correction status */}
+      {quizzes.length > 0 && (
+        <div className="rounded-xl bg-white shadow-[0_1px_3px_rgba(0,0,0,0.05),0_4px_12px_rgba(0,0,0,0.04)] ring-1 ring-neutral-200/60">
+          <div className="flex items-center gap-2 border-b border-neutral-100 px-4 py-3">
+            <PenLine className="size-4 text-brand-teal-600" />
+            <p className="text-sm font-bold text-brand-navy-900">Quiz corrections</p>
+            <Link
+              href="/leader/quizzes"
+              className="ml-auto text-xs font-semibold text-brand-teal-700 hover:underline"
+            >
+              View all
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 divide-x divide-neutral-100">
+            {[
+              { label: "Pending", value: quizzesPending, accent: quizzesPending > 0 ? "text-warning-700" : "text-brand-navy-900" },
+              { label: "Fully graded", value: quizzesGraded, accent: "text-success-700" },
+            ].map(({ label, value, accent }) => (
+              <div key={label} className="px-4 py-3 text-center">
+                <p className={`text-2xl font-black ${accent}`}>{value}</p>
+                <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-widest text-neutral-400">
+                  {label}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* At-risk students */}
       <div className="rounded-xl bg-white shadow-[0_1px_3px_rgba(0,0,0,0.05),0_4px_12px_rgba(0,0,0,0.04)] ring-1 ring-neutral-200/60">

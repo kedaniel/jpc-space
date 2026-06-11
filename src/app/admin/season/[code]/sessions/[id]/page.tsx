@@ -20,6 +20,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CheckInQr } from "@/components/sessions/check-in-qr";
 import { CheckInAttendanceList } from "@/components/sessions/check-in-attendance-list";
+import { CreateQuizForm } from "@/components/quizzes/create-quiz-form";
+import { listQuizzesForSession } from "@/lib/quiz-query";
 
 interface PageProps {
   params: Promise<{ code: string; id: string }>;
@@ -54,6 +56,8 @@ export default async function SessionDetailPage({ params }: PageProps) {
   const checkInUrl = session.checkInToken
     ? `${process.env.AUTH_URL}/checkin/${session.checkInToken}`
     : null;
+
+  const quizzes = await listQuizzesForSession(session.id);
 
   const enrollments = await db.seasonEnrollment.findMany({
     where: { seasonId: season.id, status: "ACTIVE" },
@@ -126,6 +130,30 @@ export default async function SessionDetailPage({ params }: PageProps) {
             <p className="whitespace-pre-line text-sm text-foreground">
               {session.description}
             </p>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Quizzes */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-base">Quizzes</CardTitle>
+          <CreateQuizForm sessionId={session.id} seasonId={season.id} />
+        </CardHeader>
+        <CardContent>
+          {quizzes.length === 0 ? (
+            <p className="text-sm text-neutral-500">No quizzes for this session yet.</p>
+          ) : (
+            <ul className="flex flex-col divide-y divide-neutral-100">
+              {quizzes.map((q) => (
+                <li key={q.id} className="flex items-center justify-between gap-3 py-2 first:pt-0 last:pb-0">
+                  <div>
+                    <p className="text-sm font-semibold text-brand-navy-900">{q.title}</p>
+                    <p className="text-xs text-neutral-500">Max score: {q.maxScore} · {q.gradedCount} graded</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
           )}
         </CardContent>
       </Card>
