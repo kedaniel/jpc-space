@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { StudentForm } from "@/components/students/student-form";
 import { AvatarUpload } from "@/components/students/avatar-upload";
 import { StatCard } from "@/components/students/stat-card";
-import { computeEngagementForStudent, computeAttendanceBudget } from "@/lib/engagement";
+import { computeEngagementForStudent, computeAttendanceBudget, computeAttendanceStreak } from "@/lib/engagement";
 
 export const metadata = { title: "My profile" };
 
@@ -60,6 +60,10 @@ export default async function StudentProfilePage() {
     ? Math.max(0, Math.round(100 - budget.budgetPct))
     : null;
 
+  const streak = userRow.studentProfile.activeSeasonId
+    ? await computeAttendanceStreak(user.userId, userRow.studentProfile.activeSeasonId)
+    : 0;
+
   return (
     <div className="flex flex-col gap-3 md:gap-4">
       {/* Navy hero card */}
@@ -93,7 +97,7 @@ export default async function StudentProfilePage() {
           />
           <StatCard
             label="Streak"
-            value={`🔥 ${engagement.submissionsCompleted}`}
+            value={streak > 0 ? `🔥 ${streak}` : streak}
           />
         </div>
       )}
