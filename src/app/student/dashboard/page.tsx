@@ -5,14 +5,13 @@ import { Sparkles } from "lucide-react";
 import { db } from "@/lib/db";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole } from "@/lib/auth/permissions";
-import { computeEngagementForStudent, computeAttendanceBudget } from "@/lib/engagement";
+import { computeEngagementForStudent, computeAttendanceBudget, computeAttendanceStreak } from "@/lib/engagement";
 import { listAssignmentsForStudent } from "@/lib/assignments-query";
 import { StaggerReveal } from "@/components/motion/stagger-reveal";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { EmptyState } from "@/components/ui/empty-state";
 import { StatCard } from "@/components/students/stat-card";
-import { StudentQuickNav } from "@/components/students/student-quick-nav";
 
 export const metadata = { title: "Dashboard" };
 
@@ -37,7 +36,7 @@ export default async function StudentDashboard() {
   const seasonId = user.activeSeasonId;
   const season = profile?.studentProfile?.activeSeason ?? null;
 
-  const [engagement, nextSession, assignments, budget] = seasonId
+  const [engagement, nextSession, assignments, budget, streak, allSubmissions] = seasonId
     ? await Promise.all([
         computeEngagementForStudent(user.userId, seasonId),
         db.session.findFirst({
@@ -53,12 +52,28 @@ export default async function StudentDashboard() {
         }),
         listAssignmentsForStudent(user.userId, seasonId),
         computeAttendanceBudget(user.userId, seasonId),
+        computeAttendanceStreak(user.userId, seasonId),
+        db.submission.findMany({
+          where: {
+            studentUserId: user.userId,
+            status: { in: ["SUBMITTED", "REVIEWED", "RETURNED"] },
+            submittedAt: { not: null },
+            assignment: { seasonId, deletedAt: null, dueAt: { not: null } },
+          },
+          select: {
+            submittedAt: true,
+            assignment: { select: { dueAt: true } },
+          },
+        }),
       ])
-    : ([null, null, [], null] as const);
+    : ([null, null, [], null, 0, []] as const);
 
   const pending = assignments.filter(
     (a) => a.status === "PENDING" || a.status === "DRAFT",
   );
+  const lateCount = allSubmissions.filter(
+    (s) => s.submittedAt != null && s.assignment.dueAt != null && s.submittedAt > s.assignment.dueAt!,
+  ).length;
 
   let weeksCompleted = 0;
   let weeksTotal = 0;
@@ -153,7 +168,7 @@ export default async function StudentDashboard() {
             />
             <StatCard
               label="Streak"
-              value={`🔥 ${engagement?.submissionsCompleted ?? 0}`}
+              value={streak > 0 ? `🔥 ${streak}` : streak}
             />
             <StatCard
               label="Pending"
@@ -161,6 +176,13 @@ export default async function StudentDashboard() {
               variant={pending.length > 0 ? "teal" : "white"}
             />
           </div>
+          {lateCount > 0 && (
+            <div className="rounded-xl bg-warning-50 p-3 ring-1 ring-warning-200">
+              <p className="text-xs font-bold text-warning-800">
+                ⚠ {lateCount} assignment{lateCount !== 1 ? "s" : ""} submitted late this season
+              </p>
+            </div>
+          )}
 
           {/* Next session */}
           <div className="rounded-xl bg-white p-4 shadow-[0_1px_3px_rgba(0,0,0,0.05),0_4px_12px_rgba(0,0,0,0.04)] ring-1 ring-neutral-200/60">
@@ -235,8 +257,6 @@ export default async function StudentDashboard() {
             </div>
           )}
 
-          {/* Quick nav */}
-          <StudentQuickNav />
         </>
       )}
     </StaggerReveal>
