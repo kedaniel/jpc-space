@@ -64,7 +64,7 @@ export default async function LeaderGroupsPage() {
                 href="/leader/calendar"
                 className="text-sm font-medium text-brand-teal-700 hover:underline"
               >
-                Calendar â†’
+                Calendar →
               </Link>
             </CardHeader>
             <CardContent>
