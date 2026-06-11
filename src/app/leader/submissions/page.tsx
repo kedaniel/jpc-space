@@ -12,12 +12,15 @@ export default async function LeaderSubmissionsPage() {
 
   const rows = await listSubmissionsForLeader(user.groupLeaderIds);
   const pending = rows.filter((r) => r.status === "SUBMITTED").length;
+  const lateCount = rows.filter(
+    (r) => r.submittedAt != null && r.assignmentDueAt != null && r.submittedAt > r.assignmentDueAt,
+  ).length;
 
   return (
     <>
       <PageHeader
         title="Submissions"
-        description={`${pending} pending review آ· ${rows.length} total`}
+        description={`${pending} pending review آ· ${rows.length} total${lateCount > 0 ? ` · ${lateCount} late` : ""}`}
       />
       <LeaderQueueList rows={rows} />
     </>
