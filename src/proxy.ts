@@ -35,5 +35,7 @@ export default auth((req) => {
 });
 
 export const config = {
-  matcher: ["/((?!api/auth|_next/static|_next/image|favicon.ico|.*\\..*).*)"],
+  // api/v1 is the token-authenticated mobile API — it authorizes via Bearer
+  // token in its own handlers, so it must bypass the cookie-session proxy.
+  matcher: ["/((?!api/auth|api/v1|_next/static|_next/image|favicon.ico|.*\\..*).*)"],
 };

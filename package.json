@@ -33,6 +33,7 @@
     "date-fns": "^4.3.0",
     "exceljs": "^4.4.0",
     "framer-motion": "^12.40.0",
+    "jose": "^6.2.3",
     "lucide-react": "^1.16.0",
     "nanoid": "^5.1.11",
     "next": "16.2.6",
