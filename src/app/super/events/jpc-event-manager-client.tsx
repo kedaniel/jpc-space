@@ -3,7 +3,6 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { format } from "date-fns";
 import { CalendarDays, ExternalLink, Pencil, Plus, Trash2 } from "lucide-react";
 
 import { deleteJpcEventAction } from "@/lib/jpc-event-actions";
@@ -12,29 +11,8 @@ import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { EmptyState } from "@/components/ui/empty-state";
 import type { JpcEventRow } from "@/lib/jpc-events-query";
+import { formatJpcEventWhen } from "@/lib/jpc-event-format";
 import { JpcEventForm } from "./jpc-event-form";
-
-function hasTime(d: Date): boolean {
-  return d.getHours() !== 0 || d.getMinutes() !== 0;
-}
-
-function formatOne(d: Date): string {
-  return format(d, hasTime(d) ? "EEE, MMM d, yyyy · h:mm a" : "EEE, MMM d, yyyy");
-}
-
-function formatEventWhen(start: Date, end: Date | null): string {
-  if (!end) return formatOne(start);
-  const sameDay =
-    start.getFullYear() === end.getFullYear() &&
-    start.getMonth() === end.getMonth() &&
-    start.getDate() === end.getDate();
-  if (sameDay) {
-    return hasTime(start) || hasTime(end)
-      ? `${format(start, "EEE, MMM d, yyyy · h:mm a")} – ${format(end, "h:mm a")}`
-      : formatOne(start);
-  }
-  return `${formatOne(start)} – ${formatOne(end)}`;
-}
 
 interface JpcEventManagerClientProps {
   events: JpcEventRow[];
@@ -119,7 +97,7 @@ export function JpcEventManagerClient({ events: initialEvents, seasons }: JpcEve
                   </Badge>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  {formatEventWhen(e.date, e.endDate)}
+                  {formatJpcEventWhen(e.date, e.endDate)}
                 </p>
                 {e.description && (
                   <p className="text-sm text-muted-foreground line-clamp-2">{e.description}</p>

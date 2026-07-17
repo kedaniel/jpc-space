@@ -33,6 +33,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { cn } from "@/lib/utils";
 import type { SessionListRow } from "@/lib/sessions-query";
 import type { JpcEventRow } from "@/lib/jpc-events-query";
+import { formatJpcEventWhen } from "@/lib/jpc-event-format";
 
 export const SEASON_PALETTE = [
   "bg-info-800 text-info-300",
@@ -116,8 +117,13 @@ export function SeasonCalendar({
   }
   const eventsByDay = new Map<string, JpcEventRow[]>();
   for (const e of jpcEvents) {
-    const key = format(e.date, "yyyy-MM-dd");
-    eventsByDay.set(key, [...(eventsByDay.get(key) ?? []), e]);
+    const start = startOfDay(e.date);
+    const end = e.endDate ? startOfDay(e.endDate) : start;
+    const days = end > start ? eachDayOfInterval({ start, end }).slice(0, 366) : [start];
+    for (const day of days) {
+      const key = format(day, "yyyy-MM-dd");
+      eventsByDay.set(key, [...(eventsByDay.get(key) ?? []), e]);
+    }
   }
 
   function stepLabel(): string {
@@ -239,7 +245,7 @@ function AgendaView({
       .filter((s) => s.startsAt >= today)
       .map((s) => ({ kind: "session" as const, at: s.startsAt, row: s })),
     ...jpcEvents
-      .filter((e) => e.date >= today)
+      .filter((e) => (e.endDate ?? e.date) >= today)
       .map((e) => ({ kind: "event" as const, at: e.date, row: e })),
   ].sort((a, b) => a.at.getTime() - b.at.getTime());
 
@@ -364,7 +370,9 @@ function AgendaEvent({ e }: { e: JpcEventRow }) {
           {e.visibility === "ALUMNI_ONLY" && <Lock className="size-3 shrink-0" />}
           {e.title}
         </p>
-        <p className="text-xs text-muted-foreground">JPC event</p>
+        <p className="truncate text-xs text-muted-foreground">
+          {formatJpcEventWhen(e.date, e.endDate)}
+        </p>
       </div>
       {e.url && <ExternalLink className="size-4 shrink-0 text-muted-foreground" />}
     </>
