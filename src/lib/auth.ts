@@ -1,10 +1,10 @@
 import NextAuth from "next-auth";
 import { authConfig } from "@/lib/auth.config";
 import Credentials from "next-auth/providers/credentials";
-import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { loadScopes } from "@/lib/auth/scopes";
+import { verifyCredentials } from "@/lib/auth/credentials";
 import type { UserRole } from "@/generated/prisma/enums";
 
 const credentialsSchema = z.object({
@@ -22,20 +22,9 @@ const credentialsProvider = Credentials({
   authorize: async (raw) => {
     const parsed = credentialsSchema.safeParse(raw);
     if (!parsed.success) return null;
-    const { email, password } = parsed.data;
 
-    const user = await db.user.findUnique({ where: { email } });
+    const user = await verifyCredentials(parsed.data.email, parsed.data.password);
     if (!user) return null;
-    if (user.deletedAt) return null;
-    if (!user.passwordHash) return null; // invite not yet accepted
-
-    const ok = await bcrypt.compare(password, user.passwordHash);
-    if (!ok) return null;
-
-    await db.user.update({
-      where: { id: user.id },
-      data: { lastLoginAt: new Date() },
-    });
 
     return {
       id: String(user.id),

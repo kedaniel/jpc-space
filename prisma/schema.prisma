@@ -125,6 +125,7 @@ model User {
   invitesReceived     InviteToken[]        @relation("InviteUser")
   invitesIssued       InviteToken[]        @relation("InviteIssuedBy")
   passwordResetTokens PasswordResetToken[]
+  refreshTokens       RefreshToken[]
 
   seasonsCreated          Season[]         @relation("SeasonCreatedBy")
   seasonsUpdated          Season[]         @relation("SeasonUpdatedBy")
@@ -172,6 +173,23 @@ model InviteToken {
   expiresAt   DateTime
   usedAt      DateTime?
   createdAt   DateTime  @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+// Refresh tokens for the mobile/API token-auth flow. The web app keeps using
+// Auth.js session cookies; native clients exchange these for short-lived access
+// tokens. Stored hashed so they can be revoked.
+model RefreshToken {
+  id        Int       @id @default(autoincrement())
+  tokenHash String    @unique
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  revokedAt DateTime?
+  userAgent String?
+  createdAt DateTime  @default(now())
 
   @@index([userId])
   @@index([expiresAt])
