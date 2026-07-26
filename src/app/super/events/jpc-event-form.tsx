@@ -25,6 +25,10 @@ interface JpcEventFormProps {
 
 type Visibility = "ALL" | "ALUMNI_ONLY" | "SEASON";
 
+// Must match MAX_IMAGE_BYTES in src/lib/jpc-event-actions.ts — checked here too so an
+// oversized file fails immediately instead of stalling on the upload round-trip.
+const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
+
 export function JpcEventForm({ event, seasons, onDone }: JpcEventFormProps) {
   const router = useRouter();
   const [error, setError] = React.useState<string | null>(null);
@@ -48,6 +52,12 @@ export function JpcEventForm({ event, seasons, onDone }: JpcEventFormProps) {
     setPending(true);
     setError(null);
     const fd = new FormData(e.currentTarget);
+    const photo = fd.get("photo");
+    if (photo instanceof File && photo.size > MAX_PHOTO_BYTES) {
+      setPending(false);
+      setError("Photo must be under 5 MB.");
+      return;
+    }
     const result = event
       ? await updateJpcEventAction(event.id, fd)
       : await createJpcEventAction(fd);

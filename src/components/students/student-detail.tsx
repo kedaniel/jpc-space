@@ -49,7 +49,7 @@ export function StudentDetail({
   showDocumentsTab = true,
 }: StudentDetailProps) {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 md:gap-6">
       <Card>
         <CardContent className="flex flex-col gap-4 pt-6 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-3">
