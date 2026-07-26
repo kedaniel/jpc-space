@@ -12,6 +12,7 @@ import { AttendancePill } from "@/components/ui/attendance-pill";
 import { SubmissionStatusBadge } from "@/components/ui/submission-status-badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { NoteForm } from "@/components/students/note-form";
+import { DropEnrollmentButton } from "@/components/students/drop-enrollment-button";
 import type { StudentDetailData } from "@/lib/students-query";
 import type { EngagementScore } from "@/lib/engagement";
 
@@ -170,12 +171,15 @@ export function StudentDetail({
                           {s.groupName && ` · ${s.groupName}`}
                         </p>
                       </div>
-                      <div className="flex flex-wrap gap-2 text-xs">
+                      <div className="flex flex-wrap items-center gap-2 text-xs">
                         <Badge variant="outline">{s.status}</Badge>
                         <Badge variant={s.enrollmentStatus === "ACTIVE" ? "info" : "secondary"}>
                           {s.enrollmentStatus}
                         </Badge>
                         <Badge variant="success">{s.attendancePct}% attendance</Badge>
+                        {canEdit && s.enrollmentStatus === "ACTIVE" && (
+                          <DropEnrollmentButton enrollmentId={s.enrollmentId} seasonTitle={s.title} />
+                        )}
                       </div>
                     </CardContent>
                   </Card>
