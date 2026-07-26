@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EmptyState } from "@/components/ui/empty-state";
 import { SeasonStatusBadge } from "@/components/seasons/season-status-badge";
+import { DuplicateSeasonDialog } from "@/components/seasons/duplicate-season-dialog";
 import { CalendarList } from "@/components/sessions/calendar-list";
 
 export interface SeasonDetailGroup {
@@ -22,6 +23,8 @@ export interface SeasonDetailData {
   id: number;
   code: string;
   title: string;
+  program: string;
+  year: number;
   description: string | null;
   status: SeasonStatus;
   startDate: Date;
@@ -60,11 +63,22 @@ export function SeasonDetail({
           <TabsTrigger value="groups">Groups ({season.groups.length})</TabsTrigger>
           <TabsTrigger value="sessions">Sessions ({season.sessionCount})</TabsTrigger>
         </TabsList>
-        {canEdit && editHref ? (
-          <Button variant="outline" size="sm" render={<Link href={editHref} />}>
-            <Pencil />
-            Edit season
-          </Button>
+        {canEdit ? (
+          <div className="flex flex-wrap gap-2">
+            <DuplicateSeasonDialog
+              seasonId={season.id}
+              program={season.program}
+              year={season.year}
+              startDate={season.startDate}
+              endDate={season.endDate}
+            />
+            {editHref ? (
+              <Button variant="outline" size="sm" render={<Link href={editHref} />}>
+                <Pencil />
+                Edit season
+              </Button>
+            ) : null}
+          </div>
         ) : null}
       </div>
 

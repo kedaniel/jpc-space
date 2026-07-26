@@ -6,12 +6,15 @@ import { SeasonStatus } from "@/generated/prisma/enums";
 import { DataTable, type DataTableColumn } from "@/components/ui/data-table";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { SeasonStatusBadge } from "@/components/seasons/season-status-badge";
 
 export interface SeasonRow {
   id: number;
   code: string;
   title: string;
+  program: string;
+  year: number;
   status: SeasonStatus;
   startDate: Date;
   endDate: Date;
@@ -36,16 +39,27 @@ export function SeasonsList({
   emptyAction,
   getEditHref,
 }: SeasonsListProps) {
+  if (rows.length === 0) {
+    return (
+      <EmptyState
+        icon={CalendarIcon}
+        title={emptyTitle}
+        description={emptyDescription}
+        action={emptyAction}
+      />
+    );
+  }
+
   const columns: DataTableColumn<SeasonRow>[] = [
     {
-      key: "title",
-      header: "Title",
+      key: "year",
+      header: "Year",
       cell: (row) => (
         <Link
           href={`${basePath}/${row.code}`}
           className="font-medium text-foreground hover:underline"
         >
-          {row.title}
+          {row.year}
         </Link>
       ),
     },
@@ -95,20 +109,33 @@ export function SeasonsList({
       : []),
   ];
 
+  const programs = new Map<string, SeasonRow[]>();
+  for (const row of rows) {
+    const list = programs.get(row.program) ?? [];
+    list.push(row);
+    programs.set(row.program, list);
+  }
+  const groups = [...programs.entries()]
+    .map(([program, seasons]) => ({
+      program,
+      seasons: [...seasons].sort((a, b) => b.year - a.year),
+    }))
+    .sort((a, b) => a.program.localeCompare(b.program));
+
   return (
-    <DataTable
-      columns={columns}
-      rows={rows}
-      rowKey={(r) => r.id}
-      emptyState={
-        <EmptyState
-          icon={CalendarIcon}
-          title={emptyTitle}
-          description={emptyDescription}
-          action={emptyAction}
-        />
-      }
-    />
+    <div className="flex flex-col gap-6">
+      {groups.map((g) => (
+        <div key={g.program} className="flex flex-col gap-2">
+          <div className="flex items-baseline gap-2">
+            <h2 className="text-base font-semibold text-foreground">{g.program}</h2>
+            <Badge variant="outline">
+              {g.seasons.length} year{g.seasons.length === 1 ? "" : "s"}
+            </Badge>
+          </div>
+          <DataTable columns={columns} rows={g.seasons} rowKey={(r) => r.id} />
+        </div>
+      ))}
+    </div>
   );
 }
 
