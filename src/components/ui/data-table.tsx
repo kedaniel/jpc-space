@@ -28,6 +28,10 @@ function DataTable<Row>({
     return <>{emptyState}</>;
   }
 
+  const [primary, ...rest] = columns;
+  const metaColumns = rest.filter((col) => col.header !== "");
+  const actionColumns = rest.filter((col) => col.header === "");
+
   return (
     <div className={cn("w-full", className)}>
       <div className="hidden overflow-hidden rounded-2xl border border-border/60 bg-card shadow-[var(--shadow-soft)] md:block">
@@ -71,30 +75,37 @@ function DataTable<Row>({
         </table>
       </div>
 
-      <ul className="flex flex-col gap-3 md:hidden">
-        {rows.map((row) => (
-          <li
-            key={rowKey(row)}
-            className="rounded-2xl border border-border/60 bg-card p-4 shadow-[var(--shadow-soft)]"
-          >
-            <dl className="flex flex-col gap-1.5">
-              {columns.map((col) => (
-                <div
-                  key={col.key}
-                  className="flex items-baseline justify-between gap-3"
-                >
-                  <dt className="text-xs font-medium text-muted-foreground">
-                    {col.header}
-                  </dt>
-                  <dd className="text-right text-sm text-foreground">
-                    {col.cell(row)}
-                  </dd>
+      <div className="overflow-hidden rounded-2xl border border-border/60 bg-card shadow-[var(--shadow-soft)] md:hidden">
+        <ul className="divide-y divide-border/60">
+          {rows.map((row) => (
+            <li
+              key={rowKey(row)}
+              className="flex min-h-11 items-center gap-3 px-4 py-3"
+            >
+              <div className="min-w-0 flex-1">
+                {primary.cell(row)}
+                {metaColumns.length > 0 && (
+                  <div className="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs text-muted-foreground">
+                    {metaColumns.map((col, i) => (
+                      <React.Fragment key={col.key}>
+                        {i > 0 && <span aria-hidden="true">·</span>}
+                        <span className="min-w-0">{col.cell(row)}</span>
+                      </React.Fragment>
+                    ))}
+                  </div>
+                )}
+              </div>
+              {actionColumns.length > 0 && (
+                <div className="flex shrink-0 items-center gap-1">
+                  {actionColumns.map((col) => (
+                    <React.Fragment key={col.key}>{col.cell(row)}</React.Fragment>
+                  ))}
                 </div>
-              ))}
-            </dl>
-          </li>
-        ))}
-      </ul>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }
