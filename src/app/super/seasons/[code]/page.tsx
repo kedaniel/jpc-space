@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole } from "@/lib/auth/permissions";
@@ -23,7 +24,17 @@ export default async function SuperSeasonDetailPage({ params }: PageProps) {
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <h1 className="text-2xl font-black text-brand-navy-900 dark:text-foreground">{season.title}</h1>
+        <h1 className="text-2xl font-black text-brand-navy-900 dark:text-foreground">
+          <Link
+            href={`/super/seasons/program/${encodeURIComponent(season.program)}`}
+            className="hover:underline"
+          >
+            {season.program}
+          </Link>{" "}
+          <Link href={`/super/seasons/year/${season.year}`} className="hover:underline">
+            {season.year}
+          </Link>
+        </h1>
         <p className="mt-1 text-sm text-muted-foreground">Code: {season.code}</p>
       </div>
       <SeasonDetail
