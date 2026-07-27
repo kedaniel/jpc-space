@@ -25,6 +25,7 @@ export async function listStudentsForScope(
   const where: Prisma.UserWhereInput = {
     role: "STUDENT",
     deletedAt: null,
+    graduationYear: null, // graduated students live in the Alumni list, not here
     ...(search
       ? {
           OR: [
@@ -107,6 +108,59 @@ export interface DroppedStudentRow {
   dropReason: string | null;
 }
 
+export interface AlumnusRow {
+  studentUserId: number;
+  name: string | null;
+  email: string;
+  graduationYear: number;
+  university: string | null;
+}
+
+/** Graduated students (graduationYear set). SUPER sees all; ADMIN sees alumni ever enrolled in their seasons. */
+export async function listAlumni(user: SessionUser): Promise<AlumnusRow[]> {
+  const where: Prisma.UserWhereInput = {
+    role: "STUDENT",
+    deletedAt: null,
+    graduationYear: { not: null },
+  };
+
+  if (!canReadAllStudents(user)) {
+    if (user.role === "ADMIN") {
+      if (user.seasonAdminIds.length === 0) return [];
+      const enrollments = await db.seasonEnrollment.findMany({
+        where: { seasonId: { in: user.seasonAdminIds } },
+        select: { studentUserId: true },
+        distinct: ["studentUserId"],
+      });
+      const ids = enrollments.map((e) => e.studentUserId);
+      if (ids.length === 0) return [];
+      where.id = { in: ids };
+    } else {
+      return [];
+    }
+  }
+
+  const rows = await db.user.findMany({
+    where,
+    orderBy: [{ graduationYear: "desc" }, { name: "asc" }],
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      graduationYear: true,
+      studentProfile: { select: { university: true } },
+    },
+  });
+
+  return rows.map((r) => ({
+    studentUserId: r.id,
+    name: r.name,
+    email: r.email,
+    graduationYear: r.graduationYear!,
+    university: r.studentProfile?.university ?? null,
+  }));
+}
+
 /** Students whose enrollment ended as WITHDRAWN (dropped, not graduated) — scoped like listStudentsForScope. */
 export async function listDroppedStudents(user: SessionUser): Promise<DroppedStudentRow[]> {
   const where: Prisma.SeasonEnrollmentWhereInput = { status: "WITHDRAWN" };
@@ -149,6 +203,7 @@ export interface StudentDetailData {
   email: string;
   name: string | null;
   avatarPath: string | null;
+  graduationYear: number | null;
   profile: {
     university: string | null;
     year: string | null;
@@ -226,6 +281,7 @@ export async function loadStudentDetail(
       name: true,
       email: true,
       avatarPath: true,
+      graduationYear: true,
       studentProfile: {
         select: {
           university: true,
@@ -364,6 +420,7 @@ export async function loadStudentDetail(
     email: user.email,
     name: user.name,
     avatarPath: user.avatarPath,
+    graduationYear: user.graduationYear,
     profile: {
       university: user.studentProfile?.university ?? null,
       year: user.studentProfile?.year ?? null,

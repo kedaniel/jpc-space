@@ -37,6 +37,7 @@ export default async function SuperStudentDetailPage({ params }: PageProps) {
         visibleNotes={visibleNotes}
         canEdit={await canEditStudent(user, studentUserId)}
         canWriteNote={await canWriteNote(user, studentUserId)}
+        canGraduate
         editHref={`/super/students/${student.id}/edit`}
       />
     </div>

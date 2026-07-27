@@ -13,6 +13,7 @@ import { SubmissionStatusBadge } from "@/components/ui/submission-status-badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { NoteForm } from "@/components/students/note-form";
 import { DropEnrollmentButton } from "@/components/students/drop-enrollment-button";
+import { GraduateStudentButton } from "@/components/students/graduate-student-button";
 import type { StudentDetailData } from "@/lib/students-query";
 import type { EngagementScore } from "@/lib/engagement";
 
@@ -22,6 +23,7 @@ interface StudentDetailProps {
   visibleNotes: StudentDetailData["notes"];
   canEdit: boolean;
   canWriteNote: boolean;
+  canGraduate?: boolean;
   editHref?: string;
   reviewBasePath?: string; // e.g. "/leader/submissions"
   showNotesTab?: boolean;
@@ -43,6 +45,7 @@ export function StudentDetail({
   visibleNotes,
   canEdit,
   canWriteNote,
+  canGraduate = false,
   editHref,
   reviewBasePath = "/leader/submissions",
   showNotesTab = true,
@@ -61,6 +64,9 @@ export function StudentDetail({
               <p className="text-lg font-semibold">{student.name ?? student.email}</p>
               <p className="text-sm text-muted-foreground">{student.email}</p>
               <div className="mt-1 flex flex-wrap gap-2 text-xs">
+                {student.graduationYear != null && (
+                  <Badge variant="success">Alumnus · {student.graduationYear}</Badge>
+                )}
                 {student.profile.activeSeasonTitle && (
                   <Badge variant="outline">{student.profile.activeSeasonTitle}</Badge>
                 )}
@@ -78,6 +84,12 @@ export function StudentDetail({
               <Button variant="outline" render={<a href={`tel:${student.profile.phone}`} />}>
                 <Phone /> Call
               </Button>
+            )}
+            {canGraduate && student.graduationYear == null && (
+              <GraduateStudentButton
+                studentUserId={student.id}
+                studentName={student.name ?? student.email}
+              />
             )}
             {canEdit && editHref && (
               <Button render={<Link href={editHref} />}>Edit profile</Button>

@@ -107,6 +107,7 @@ async function main() {
     },
   });
 
+  // Leader/Admin/Mentor may only be held by an alumnus, so they carry a graduationYear.
   const adminUsers = await Promise.all(
     ["Anna Admin", "Boutros Admin", "Cyril Admin"].map((n, i) =>
       db.user.create({
@@ -114,6 +115,7 @@ async function main() {
           email: `admin${i + 1}@jpc.test`,
           name: n,
           role: "ADMIN",
+          graduationYear: 2018 + i,
           passwordHash,
         },
       }),
@@ -127,6 +129,7 @@ async function main() {
           email: `mentor${i + 1}@jpc.test`,
           name: n,
           role: "MENTOR",
+          graduationYear: 2010 + i,
           passwordHash,
         },
       }),
@@ -142,6 +145,7 @@ async function main() {
           email: `leader${i + 1}@jpc.test`,
           name: `${n.first} ${n.last}`,
           role: "LEADER",
+          graduationYear: 2019 + (i % 4),
           passwordHash,
         },
       });
