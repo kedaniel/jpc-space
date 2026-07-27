@@ -31,7 +31,8 @@ const schema = z
     code: z.string().min(2).refine(isValidSeasonCode, {
       message: "Lowercase letters, numbers, and dashes only.",
     }),
-    title: z.string().min(2, "Title is required."),
+    program: z.string().min(1, "Program is required.").max(60),
+    year: z.number().int().min(2000).max(2100),
     description: z.string().max(2000).optional(),
     startDate: z.date({ message: "Start date required." }),
     endDate: z.date({ message: "End date required." }),
@@ -80,7 +81,8 @@ export function SeasonForm({ mode, seasonId, defaultValues }: SeasonFormProps) {
     resolver: zodResolver(schema),
     defaultValues: {
       code: defaultValues?.code ?? "",
-      title: defaultValues?.title ?? "",
+      program: defaultValues?.program ?? "",
+      year: defaultValues?.year ?? new Date().getFullYear(),
       description: defaultValues?.description ?? "",
       startDate: defaultValues?.startDate,
       endDate: defaultValues?.endDate,
@@ -90,23 +92,25 @@ export function SeasonForm({ mode, seasonId, defaultValues }: SeasonFormProps) {
     },
   });
 
-  const title = useWatch({ control, name: "title" });
+  const program = useWatch({ control, name: "program" });
+  const year = useWatch({ control, name: "year" });
   const [codeTouched, setCodeTouched] = React.useState(
     mode === "edit" || Boolean(defaultValues?.code),
   );
 
   React.useEffect(() => {
     if (codeTouched) return;
-    if (!title) return;
-    setValue("code", slugifySeasonCode(title), { shouldValidate: false });
-  }, [title, codeTouched, setValue]);
+    if (!program || !year) return;
+    setValue("code", slugifySeasonCode(`${program} ${year}`), { shouldValidate: false });
+  }, [program, year, codeTouched, setValue]);
 
   const onSubmit = handleSubmit((values) => {
     setSubmitError(null);
     startTransition(async () => {
       const payload: SeasonInput = {
         code: values.code,
-        title: values.title,
+        program: values.program,
+        year: values.year,
         description: values.description ?? null,
         startDate: values.startDate,
         endDate: values.endDate,
@@ -135,21 +139,33 @@ export function SeasonForm({ mode, seasonId, defaultValues }: SeasonFormProps) {
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-4 md:gap-6">
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <FormField label="Title" required error={errors.title?.message}>
-          <Input {...register("title")} placeholder="e.g. Summer 2026" />
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <FormField
+          label="Program"
+          required
+          description='The recurring program, e.g. "GBV". Groups this season with its other years.'
+          error={errors.program?.message}
+        >
+          <Input {...register("program")} placeholder="GBV" />
+        </FormField>
+        <FormField label="Year" required error={errors.year?.message}>
+          <Input
+            type="number"
+            {...register("year", { valueAsNumber: true })}
+            placeholder="2026"
+          />
         </FormField>
         <FormField
           label="Code"
           required
-          description="URL slug — auto-filled from title."
+          description="URL slug — auto-filled from program + year."
           error={errors.code?.message}
         >
           <Input
             {...register("code", {
               onChange: () => setCodeTouched(true),
             })}
-            placeholder="summer-2026"
+            placeholder="gbv-2026"
           />
         </FormField>
       </div>

@@ -25,6 +25,8 @@ export default async function EditSeasonPage({ params }: PageProps) {
       id: true,
       code: true,
       title: true,
+      program: true,
+      year: true,
       description: true,
       status: true,
       startDate: true,
@@ -51,7 +53,8 @@ export default async function EditSeasonPage({ params }: PageProps) {
             seasonId={season.id}
             defaultValues={{
               code: season.code,
-              title: season.title,
+              program: season.program,
+              year: season.year,
               description: season.description ?? "",
               status: season.status,
               startDate: season.startDate,

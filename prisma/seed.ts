@@ -177,6 +177,8 @@ async function main() {
     data: {
       code: "gbv-2026",
       title: "GBV 2026",
+      program: "GBV",
+      year: 2026,
       description: "Growing By the Vine — discipleship course for Spring 2026.",
       startDate: new Date("2026-02-01"),
       endDate: new Date("2026-05-31"),
@@ -189,6 +191,8 @@ async function main() {
     data: {
       code: "tw-2025",
       title: "TW 2025",
+      program: "TW",
+      year: 2025,
       description: "The Word — completed retreat-style course.",
       startDate: new Date("2025-06-01"),
       endDate: new Date("2025-09-15"),
