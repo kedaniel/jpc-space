@@ -34,7 +34,12 @@ export default async function SuperStudentsPage({
         title="Students"
         description={`${rowsWithAvatars.length} student${rowsWithAvatars.length === 1 ? "" : "s"}`}
         actions={
-          <Button render={<Link href="/super/students/new" />}>New student</Button>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" render={<Link href="/super/students/dropped" />}>
+              Dropped students
+            </Button>
+            <Button render={<Link href="/super/students/new" />}>New student</Button>
+          </div>
         }
       />
       <SearchBox initial={q} action="/super/students" />

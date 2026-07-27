@@ -95,6 +95,55 @@ export async function listStudentsForScope(
   }));
 }
 
+export interface DroppedStudentRow {
+  enrollmentId: number;
+  studentUserId: number;
+  name: string | null;
+  email: string;
+  seasonId: number;
+  seasonProgram: string;
+  seasonYear: number;
+  droppedAt: Date;
+  dropReason: string | null;
+}
+
+/** Students whose enrollment ended as WITHDRAWN (dropped, not graduated) — scoped like listStudentsForScope. */
+export async function listDroppedStudents(user: SessionUser): Promise<DroppedStudentRow[]> {
+  const where: Prisma.SeasonEnrollmentWhereInput = { status: "WITHDRAWN" };
+  if (!canReadAllStudents(user)) {
+    if (user.role === "ADMIN") {
+      if (user.seasonAdminIds.length === 0) return [];
+      where.seasonId = { in: user.seasonAdminIds };
+    } else {
+      return [];
+    }
+  }
+
+  const rows = await db.seasonEnrollment.findMany({
+    where,
+    orderBy: { droppedAt: "desc" },
+    select: {
+      id: true,
+      droppedAt: true,
+      dropReason: true,
+      studentUser: { select: { id: true, name: true, email: true } },
+      season: { select: { id: true, program: true, year: true } },
+    },
+  });
+
+  return rows.map((r) => ({
+    enrollmentId: r.id,
+    studentUserId: r.studentUser.id,
+    name: r.studentUser.name,
+    email: r.studentUser.email,
+    seasonId: r.season.id,
+    seasonProgram: r.season.program,
+    seasonYear: r.season.year,
+    droppedAt: r.droppedAt!,
+    dropReason: r.dropReason,
+  }));
+}
+
 export interface StudentDetailData {
   id: number;
   email: string;
@@ -116,6 +165,7 @@ export interface StudentDetailData {
   currentGroup: { id: number; name: string } | null;
   seasons: {
     id: number;
+    enrollmentId: number;
     title: string;
     code: string;
     status: string;
@@ -201,6 +251,7 @@ export async function loadStudentDetail(
     where: { studentUserId },
     orderBy: { enrolledAt: "desc" },
     select: {
+      id: true,
       seasonId: true,
       status: true,
       season: {
@@ -333,6 +384,7 @@ export async function loadStudentDetail(
       const att = attendanceBySeason.get(e.seasonId) ?? { total: 0, present: 0 };
       return {
         id: e.season.id,
+        enrollmentId: e.id,
         title: e.season.title,
         code: e.season.code,
         status: e.season.status,
