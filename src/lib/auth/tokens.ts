@@ -24,6 +24,7 @@ export async function signAccessToken(
     seasonAdminIds: user.seasonAdminIds,
     groupLeaderIds: user.groupLeaderIds,
     activeSeasonId: user.activeSeasonId,
+    graduationYear: user.graduationYear,
   })
     .setProtectedHeader({ alg: "HS256" })
     .setSubject(String(user.userId))
@@ -45,6 +46,7 @@ export async function verifyAccessToken(token: string): Promise<SessionUser | nu
       seasonAdminIds: (payload.seasonAdminIds as number[] | undefined) ?? [],
       groupLeaderIds: (payload.groupLeaderIds as number[] | undefined) ?? [],
       activeSeasonId: (payload.activeSeasonId as number | null | undefined) ?? null,
+      graduationYear: (payload.graduationYear as number | null | undefined) ?? null,
     };
   } catch {
     return null;
