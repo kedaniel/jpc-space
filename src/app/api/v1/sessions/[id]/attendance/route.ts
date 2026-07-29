@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { AttendanceStatus } from "@/generated/prisma/enums";
 import { canMarkAttendance } from "@/lib/auth/permissions";
 import { loadAttendanceRoster } from "@/lib/sessions-query";
+import { flagLowAttendance } from "@/lib/attendance-notifications";
 
 export const runtime = "nodejs";
 
@@ -74,6 +75,8 @@ export const POST = withApiAuth<RouteContext<"/api/v1/sessions/[id]/attendance">
         }),
       ),
     );
+
+    await flagLowAttendance(sessionId, parsed.data.entries);
 
     return apiOk({ saved: parsed.data.entries.length });
   },
