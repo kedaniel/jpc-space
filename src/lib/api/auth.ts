@@ -14,15 +14,21 @@ export async function getApiUser(request: NextRequest): Promise<SessionUser | nu
   return verifyAccessToken(token);
 }
 
-type AuthedHandler = (request: NextRequest, user: SessionUser) => Promise<Response> | Response;
+type AuthedHandler<Ctx> = (
+  request: NextRequest,
+  user: SessionUser,
+  context: Ctx,
+) => Promise<Response> | Response;
 
 /** Wrap an API route so it only runs for an authenticated user, mapping known errors to JSON. */
-export function withApiAuth(handler: AuthedHandler) {
-  return async (request: NextRequest): Promise<Response> => {
+export function withApiAuth<Ctx = { params: Promise<Record<string, never>> }>(
+  handler: AuthedHandler<Ctx>,
+) {
+  return async (request: NextRequest, context: Ctx): Promise<Response> => {
     const user = await getApiUser(request);
     if (!user) return apiError("unauthorized", "Missing or invalid access token.", 401);
     try {
-      return await handler(request, user);
+      return await handler(request, user, context);
     } catch (err) {
       if (err instanceof ForbiddenError) return apiError("forbidden", "You don't have access to this.", 403);
       if (err instanceof UnauthorizedError) return apiError("unauthorized", "Not authenticated.", 401);
