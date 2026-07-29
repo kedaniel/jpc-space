@@ -1,163 +1,31 @@
-import { format } from "date-fns";
-import { Sparkles } from "lucide-react";
-
-import { db } from "@/lib/db";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole } from "@/lib/auth/permissions";
-import { Badge } from "@/components/ui/badge";
-import { EmptyState } from "@/components/ui/empty-state";
+import { loadSeasonHistory } from "@/lib/season-history-query";
+import { SeasonHistory } from "@/components/students/season-history";
 
 export const metadata = { title: "History" };
 
 /**
- * Privacy-critical page: shows past seasons the student participated in,
- * but DELIBERATELY DOES NOT FETCH submissions, feedback, or engagement notes.
- * Curriculum view is limited to session titles + dates.
+ * Privacy-critical page: shows past seasons the student participated in via the
+ * shared SeasonHistory (attendance % + curriculum titles/dates only — NO
+ * submissions, feedback, or notes).
  */
 export default async function StudentHistoryPage() {
   const user = await getCurrentUserOrRedirect();
   requireRole(user, ["STUDENT"]);
 
-  // Past enrollments only — exclude the student's current active season.
-  const enrollments = await db.seasonEnrollment.findMany({
-    where: {
-      studentUserId: user.userId,
-      ...(user.activeSeasonId ? { seasonId: { not: user.activeSeasonId } } : {}),
-    },
-    orderBy: { enrolledAt: "desc" },
-    select: {
-      seasonId: true,
-      status: true,
-      enrolledAt: true,
-      completedAt: true,
-      season: {
-        select: {
-          id: true,
-          title: true,
-          code: true,
-          status: true,
-          startDate: true,
-          endDate: true,
-          coverImagePath: true,
-        },
-      },
-      group: { select: { name: true } },
-    },
-  });
-
-  if (enrollments.length === 0) {
-    return (
-      <div className="flex flex-col gap-3 md:gap-4">
-        <h1 className="text-2xl font-black text-brand-navy-900 dark:text-foreground">History</h1>
-        <EmptyState
-          icon={Sparkles}
-          title="No past seasons"
-          description="Once you complete a season, it'll appear here."
-        />
-      </div>
-    );
-  }
-
-  // Compute attendance % per past season — NO submission data fetched here.
-  // Curriculum (session titles + dates only). NO materials, NO notes content.
-  const seasonIds = enrollments.map((e) => e.seasonId);
-  const [allSessions, presentRecords] = await Promise.all([
-    db.session.findMany({
-      where: { seasonId: { in: seasonIds } },
-      orderBy: { startsAt: "asc" },
-      select: { id: true, title: true, startsAt: true, seasonId: true },
-    }),
-    db.attendance.findMany({
-      where: {
-        studentUserId: user.userId,
-        session: { seasonId: { in: seasonIds } },
-        status: { in: ["PRESENT", "LATE"] },
-      },
-      select: { session: { select: { seasonId: true } } },
-    }),
-  ]);
-
-  const attendanceByseason = new Map<number, { total: number; present: number }>();
-  const curriculaBySeason = new Map<number, { id: number; title: string; startsAt: Date }[]>();
-  for (const s of allSessions) {
-    const entry = attendanceByseason.get(s.seasonId) ?? { total: 0, present: 0 };
-    entry.total += 1;
-    attendanceByseason.set(s.seasonId, entry);
-    const curriculum = curriculaBySeason.get(s.seasonId) ?? [];
-    curriculum.push({ id: s.id, title: s.title, startsAt: s.startsAt });
-    curriculaBySeason.set(s.seasonId, curriculum);
-  }
-  for (const r of presentRecords) {
-    const entry = attendanceByseason.get(r.session.seasonId);
-    if (entry) entry.present += 1;
-  }
+  const rows = await loadSeasonHistory(user.userId, user.activeSeasonId);
 
   return (
     <div className="flex flex-col gap-3 md:gap-4">
       <div>
         <h1 className="text-2xl font-black text-brand-navy-900 dark:text-foreground">History</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Seasons you&apos;ve participated in
-        </p>
+        <p className="mt-1 text-sm text-muted-foreground">Seasons you&apos;ve participated in</p>
       </div>
-
-      <ol className="flex flex-col gap-3">
-        {enrollments.map((e) => {
-          const att = attendanceByseason.get(e.seasonId) ?? {
-            total: 0,
-            present: 0,
-          };
-          const attendancePct =
-            att.total > 0 ? Math.round((att.present / att.total) * 100) : 0;
-          const sessions = curriculaBySeason.get(e.seasonId) ?? [];
-
-          return (
-            <li key={e.seasonId}>
-              <div className="rounded-2xl border border-border bg-card p-4 shadow-[var(--shadow-soft)]">
-                {/* Season title row */}
-                <div className="flex flex-wrap items-start justify-between gap-2">
-                  <div>
-                    <p className="text-base font-bold text-brand-navy-900 dark:text-foreground">
-                      {e.season.title}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {format(e.season.startDate, "MMM d, yyyy")} –{" "}
-                      {format(e.season.endDate, "MMM d, yyyy")}
-                      {e.group?.name && ` · ${e.group.name}`}
-                    </p>
-                  </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    <Badge variant="teal">{attendancePct}% attended</Badge>
-                    <Badge variant="success">Participated</Badge>
-                  </div>
-                </div>
-
-                {/* Curriculum accordion */}
-                {sessions.length > 0 && (
-                  <details className="mt-3 text-sm">
-                    <summary className="cursor-pointer font-semibold text-brand-navy-700 dark:text-brand-navy-200">
-                      Curriculum ({sessions.length} sessions)
-                    </summary>
-                    <ol className="mt-2 flex flex-col gap-1 text-muted-foreground">
-                      {sessions.map((s) => (
-                        <li
-                          key={s.id}
-                          className="flex justify-between gap-3 border-t border-border pt-1 first:border-0 first:pt-0"
-                        >
-                          <span>{s.title}</span>
-                          <span className="shrink-0 text-xs tabular-nums">
-                            {format(s.startsAt, "MMM d, yyyy")}
-                          </span>
-                        </li>
-                      ))}
-                    </ol>
-                  </details>
-                )}
-              </div>
-            </li>
-          );
-        })}
-      </ol>
+      <SeasonHistory
+        rows={rows}
+        emptyDescription="Once you complete a season, it'll appear here."
+      />
     </div>
   );
 }

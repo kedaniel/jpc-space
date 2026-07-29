@@ -44,6 +44,7 @@ async function sessionUserFor(email: string): Promise<SessionUser> {
     seasonAdminIds: scopes.seasonAdminIds,
     groupLeaderIds: scopes.groupLeaderIds,
     activeSeasonId: scopes.activeSeasonId,
+    graduationYear: scopes.graduationYear,
   };
 }
 
@@ -96,6 +97,7 @@ async function main() {
       seasonAdminIds: scopes.seasonAdminIds,
       groupLeaderIds: scopes.groupLeaderIds,
       activeSeasonId: scopes.activeSeasonId,
+      graduationYear: scopes.graduationYear,
     };
   })();
   // A student NOT in Alpha — pick one whose group != alphaGroup

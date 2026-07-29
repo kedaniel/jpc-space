@@ -6,10 +6,19 @@ export interface SessionUser {
   seasonAdminIds: number[];
   groupLeaderIds: number[];
   activeSeasonId: number | null;
+  graduationYear: number | null;
 }
 
 export function isSuper(u: SessionUser): boolean {
   return u.role === "SUPER";
+}
+
+/**
+ * An alumnus is a graduated student — role stays STUDENT, but graduationYear is
+ * set. Alumni get the read-only /alumni portal instead of the active-student one.
+ */
+export function isAlumnus(u: SessionUser): boolean {
+  return u.role === "STUDENT" && u.graduationYear != null;
 }
 
 export function isMentor(u: SessionUser): boolean {

@@ -24,7 +24,7 @@ export default auth((req) => {
     return NextResponse.redirect(url);
   }
 
-  if (!rolePrefixAllowed(user.role, pathname)) {
+  if (!rolePrefixAllowed(user.role, pathname, user.graduationYear ?? null)) {
     const url = nextUrl.clone();
     url.pathname = "/forbidden";
     url.search = "";

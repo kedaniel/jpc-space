@@ -38,7 +38,9 @@ function notificationsHrefFor(user: SessionUser): string {
     case "MENTOR":
       return "/mentor/notifications";
     case "STUDENT":
-      return "/student/notifications";
+      return user.graduationYear != null
+        ? "/alumni/notifications"
+        : "/student/notifications";
   }
 }
 

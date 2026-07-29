@@ -8,6 +8,7 @@ declare module "@auth/core/types" {
       seasonAdminIds: number[];
       groupLeaderIds: number[];
       activeSeasonId: number | null;
+      graduationYear: number | null;
     } & DefaultSession["user"];
   }
 
@@ -23,5 +24,6 @@ declare module "@auth/core/jwt" {
     seasonAdminIds?: number[];
     groupLeaderIds?: number[];
     activeSeasonId?: number | null;
+    graduationYear?: number | null;
   }
 }

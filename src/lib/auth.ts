@@ -89,6 +89,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.seasonAdminIds = scopes.seasonAdminIds;
         token.groupLeaderIds = scopes.groupLeaderIds;
         token.activeSeasonId = scopes.activeSeasonId;
+        token.graduationYear = scopes.graduationYear;
       }
       return token;
     },
@@ -98,6 +99,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       session.user.seasonAdminIds = token.seasonAdminIds ?? [];
       session.user.groupLeaderIds = token.groupLeaderIds ?? [];
       session.user.activeSeasonId = token.activeSeasonId ?? null;
+      session.user.graduationYear = token.graduationYear ?? null;
       return session;
     },
   },

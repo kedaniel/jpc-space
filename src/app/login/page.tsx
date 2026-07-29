@@ -15,7 +15,10 @@ export default async function LoginPage({
   const session = await auth();
   const params = await searchParams;
   if (session?.user?.role) {
-    redirect(params.callbackUrl ?? dashboardPathForRole(session.user.role));
+    redirect(
+      params.callbackUrl ??
+        dashboardPathForRole(session.user.role, session.user.graduationYear ?? null),
+    );
   }
   return (
     <main className="flex min-h-dvh items-center justify-center px-4 py-12">
