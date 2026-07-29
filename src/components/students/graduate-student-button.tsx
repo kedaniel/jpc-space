@@ -50,7 +50,7 @@ export function GraduateStudentButton({ studentUserId, studentName }: GraduateSt
             leader, season admin, or mentor.
           </ModalDescription>
         </ModalHeader>
-        <FormField label="Graduation year" required error={error ?? undefined}>
+        <FormField label="JPCS graduation year" required error={error ?? undefined}>
           <Input
             type="number"
             inputMode="numeric"

@@ -162,7 +162,7 @@ export function UserForm({ mode, userId, isInactive, defaultValues }: UserFormPr
           </Select>
         </FormField>
         <FormField
-          label="Graduation year"
+          label="JPCS graduation year"
           required={roleRequiresAlumnus(roleValue)}
           description={
             roleRequiresAlumnus(roleValue)
