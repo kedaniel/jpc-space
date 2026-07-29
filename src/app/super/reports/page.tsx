@@ -44,6 +44,7 @@ export default async function SuperReportsPage() {
       header: "Status",
       cell: (r) => <SeasonStatusBadge status={r.status as SeasonStatus} />,
     },
+    { key: "leaders", header: "Leaders", cell: (r) => r.leaderCount },
     { key: "active", header: "Active", cell: (r) => r.activeCount },
     { key: "completed", header: "Completed", cell: (r) => r.completedCount },
     {

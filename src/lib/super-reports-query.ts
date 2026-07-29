@@ -9,6 +9,7 @@ export interface SeasonEnrollmentCount {
   activeCount: number;
   completedCount: number;
   droppedCount: number;
+  leaderCount: number;
 }
 
 export interface AlumniByYear {
@@ -39,6 +40,8 @@ export async function loadSuperReports(): Promise<SuperReportsData> {
         title: true,
         status: true,
         enrollments: { select: { status: true } },
+        // Leaders are assigned per group; count distinct leaders across the season's groups.
+        groups: { select: { leaders: { select: { userId: true } } } },
       },
     }),
     db.user.findMany({
@@ -56,6 +59,10 @@ export async function loadSuperReports(): Promise<SuperReportsData> {
       else if (e.status === "COMPLETED") completed += 1;
       else if (e.status === "WITHDRAWN") dropped += 1;
     }
+    const leaderIds = new Set<number>();
+    for (const g of s.groups) {
+      for (const l of g.leaders) leaderIds.add(l.userId);
+    }
     return {
       seasonId: s.id,
       program: s.program,
@@ -65,6 +72,7 @@ export async function loadSuperReports(): Promise<SuperReportsData> {
       activeCount: active,
       completedCount: completed,
       droppedCount: dropped,
+      leaderCount: leaderIds.size,
     };
   });
 

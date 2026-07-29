@@ -16,7 +16,6 @@ export interface ImportProfileFields {
   spiritualBackground?: string;
   gifts?: string;
   notes?: string;
-  graduationYear?: string;
 }
 
 type ProfileFieldKey = keyof ImportProfileFields;
@@ -40,10 +39,6 @@ const PROFILE_ALIASES: Record<string, ProfileFieldKey> = {
   gifts: "gifts",
   "spiritual gifts": "gifts",
   notes: "notes",
-  "graduation year": "graduationYear",
-  "grad year": "graduationYear",
-  graduated: "graduationYear",
-  "class of": "graduationYear",
 };
 
 const FIELD_LABELS: Record<ProfileFieldKey, string> = {
@@ -54,7 +49,6 @@ const FIELD_LABELS: Record<ProfileFieldKey, string> = {
   spiritualBackground: "Spiritual background",
   gifts: "Gifts",
   notes: "Notes",
-  graduationYear: "Graduation year",
 };
 
 export interface ImportPreviewRow {
@@ -83,20 +77,8 @@ const profileSchema = z
     spiritualBackground: z.string().trim().max(2000).optional(),
     gifts: z.string().trim().max(2000).optional(),
     notes: z.string().trim().max(2000).optional(),
-    graduationYear: z.string().trim().max(4).optional(),
   })
   .optional();
-
-const CURRENT_YEAR = new Date().getFullYear();
-
-/** Parses a graduation-year cell to a valid year, or null. Returns "invalid" for a present-but-bad value. */
-function parseGraduationYear(raw: string | undefined): number | null | "invalid" {
-  if (!raw) return null;
-  if (!/^\d{4}$/.test(raw)) return "invalid";
-  const y = Number(raw);
-  if (y < 1990 || y > CURRENT_YEAR) return "invalid";
-  return y;
-}
 
 const rowSchema = z.object({
   name: z.string().trim().min(2).max(120),
@@ -151,17 +133,6 @@ export async function buildImportPreview(buffer: Buffer, filename: string): Prom
         email,
         status: "invalid",
         message: name.length < 2 ? "Name is missing or too short." : "Email is not valid.",
-        profile,
-      });
-      continue;
-    }
-    if (parseGraduationYear(profile.graduationYear) === "invalid") {
-      rows.push({
-        rowNumber: r,
-        name,
-        email,
-        status: "invalid",
-        message: `Graduation year must be a year between 1990 and ${CURRENT_YEAR}.`,
         profile,
       });
       continue;
@@ -249,11 +220,20 @@ function toStudentProfileData(seasonId: number | null, profile: ImportProfileFie
   };
 }
 
+/**
+ * How to import the whole file: either as active students enrolled in a season,
+ * or as alumni graduated in a given JPCS year (no season enrollment).
+ */
+export type ImportMode =
+  | { kind: "season"; seasonId: number }
+  | { kind: "alumni"; graduationYear: number };
+
 export async function commitStudentImport(
   input: ImportCommitRow[],
-  seasonId: number,
+  mode: ImportMode,
 ): Promise<ImportCommitResult> {
   const rows: CommitResultRow[] = [];
+  const isAlumni = mode.kind === "alumni";
 
   for (const item of input) {
     const parsed = rowSchema.safeParse(item);
@@ -270,28 +250,23 @@ export async function commitStudentImport(
         continue;
       }
 
-      // A graduation year marks this row as an alumnus: create with graduationYear
-      // set and NO active season enrollment (they've already graduated).
-      const gradYear = parseGraduationYear(profile?.graduationYear);
-      const isAlumnusRow = typeof gradYear === "number";
-
       const created = await db.$transaction(async (tx) => {
         const user = await tx.user.create({
           data: {
             name,
             email,
             role: UserRole.STUDENT,
-            graduationYear: isAlumnusRow ? gradYear : null,
+            graduationYear: isAlumni ? mode.graduationYear : null,
             passwordHash: null,
             studentProfile: {
-              create: toStudentProfileData(isAlumnusRow ? null : seasonId, profile),
+              create: toStudentProfileData(isAlumni ? null : mode.seasonId, profile),
             },
           },
           select: { id: true },
         });
-        if (!isAlumnusRow) {
+        if (!isAlumni) {
           await tx.seasonEnrollment.create({
-            data: { studentUserId: user.id, seasonId, status: EnrollmentStatus.ACTIVE },
+            data: { studentUserId: user.id, seasonId: mode.seasonId, status: EnrollmentStatus.ACTIVE },
           });
         }
         return user;

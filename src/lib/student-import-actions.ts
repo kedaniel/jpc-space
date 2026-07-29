@@ -46,29 +46,37 @@ export async function previewStudentImportAction(formData: FormData): Promise<Pr
   }
 }
 
-const commitSchema = z.object({
-  seasonId: z.number().int().positive(),
-  rows: z
-    .array(
-      z.object({
-        name: z.string(),
-        email: z.string(),
-        profile: z
-          .object({
-            phone: z.string().optional(),
-            university: z.string().optional(),
-            year: z.string().optional(),
-            dateOfBirth: z.string().optional(),
-            spiritualBackground: z.string().optional(),
-            gifts: z.string().optional(),
-            notes: z.string().optional(),
-          })
-          .optional(),
-      }),
-    )
-    .min(1)
-    .max(2000),
-});
+const CURRENT_YEAR = new Date().getFullYear();
+
+const rowsSchema = z
+  .array(
+    z.object({
+      name: z.string(),
+      email: z.string(),
+      profile: z
+        .object({
+          phone: z.string().optional(),
+          university: z.string().optional(),
+          year: z.string().optional(),
+          dateOfBirth: z.string().optional(),
+          spiritualBackground: z.string().optional(),
+          gifts: z.string().optional(),
+          notes: z.string().optional(),
+        })
+        .optional(),
+    }),
+  )
+  .min(1)
+  .max(2000);
+
+const commitSchema = z.discriminatedUnion("mode", [
+  z.object({ mode: z.literal("season"), seasonId: z.number().int().positive(), rows: rowsSchema }),
+  z.object({
+    mode: z.literal("alumni"),
+    graduationYear: z.number().int().min(1990).max(CURRENT_YEAR),
+    rows: rowsSchema,
+  }),
+]);
 
 export type CommitActionResult =
   | { ok: true; result: ImportCommitResult }
@@ -83,13 +91,25 @@ export async function commitStudentImportAction(
   const parsed = commitSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: "Invalid import request." };
 
-  const season = await db.season.findFirst({
-    where: { id: parsed.data.seasonId, deletedAt: null },
-    select: { id: true },
-  });
-  if (!season) return { ok: false, error: "The selected season no longer exists." };
+  if (parsed.data.mode === "season") {
+    const season = await db.season.findFirst({
+      where: { id: parsed.data.seasonId, deletedAt: null },
+      select: { id: true },
+    });
+    if (!season) return { ok: false, error: "The selected season no longer exists." };
 
-  const result = await commitStudentImport(parsed.data.rows, season.id);
+    const result = await commitStudentImport(parsed.data.rows, {
+      kind: "season",
+      seasonId: season.id,
+    });
+    revalidatePath("/super/users");
+    return { ok: true, result };
+  }
+
+  const result = await commitStudentImport(parsed.data.rows, {
+    kind: "alumni",
+    graduationYear: parsed.data.graduationYear,
+  });
   revalidatePath("/super/users");
   return { ok: true, result };
 }
