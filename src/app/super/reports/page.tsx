@@ -5,10 +5,10 @@ import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { requireRole } from "@/lib/auth/permissions";
 import { loadSuperReports, type SeasonEnrollmentCount } from "@/lib/super-reports-query";
 import { StatCard } from "@/components/students/stat-card";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DataTable, type DataTableColumn } from "@/components/ui/data-table";
 import { EmptyState } from "@/components/ui/empty-state";
+import { PieChartCard } from "@/components/ui/charts";
 import { SeasonStatusBadge } from "@/components/seasons/season-status-badge";
 import type { SeasonStatus } from "@/generated/prisma/enums";
 
@@ -19,6 +19,15 @@ export default async function SuperReportsPage() {
   requireRole(user, ["SUPER"]);
 
   const data = await loadSuperReports();
+
+  // Pie: one slice per season sized by its current active enrollment.
+  const studentsPerSeasonPie = data.seasons
+    .filter((s) => s.activeCount > 0)
+    .map((s) => ({ name: s.title, value: s.activeCount }));
+  const alumniByYearPie = data.alumniByYear.map((a) => ({
+    name: String(a.year),
+    value: a.count,
+  }));
 
   const seasonColumns: DataTableColumn<SeasonEnrollmentCount>[] = [
     {
@@ -62,40 +71,60 @@ export default async function SuperReportsPage() {
         <StatCard label="Active seasons" value={data.activeSeasonCount} href="/super/seasons" />
       </div>
 
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
+        {studentsPerSeasonPie.length === 0 ? (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Active members per season</CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <EmptyState
+                icon={GraduationCap}
+                title="No active members"
+                description="Enroll students in a season to see the breakdown."
+              />
+            </CardContent>
+          </Card>
+        ) : (
+          <PieChartCard
+            title="Active members per season"
+            description="Current active enrollment across seasons"
+            data={studentsPerSeasonPie}
+          />
+        )}
+
+        {alumniByYearPie.length === 0 ? (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Alumni by graduation year</CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <EmptyState
+                icon={GraduationCap}
+                title="No alumni yet"
+                description="Graduated students will be counted here by class year."
+              />
+            </CardContent>
+          </Card>
+        ) : (
+          <PieChartCard
+            title="Alumni by graduation year"
+            description="Graduates grouped by class year"
+            data={alumniByYearPie}
+          />
+        )}
+      </div>
+
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Students per season</CardTitle>
+          <p className="text-sm text-muted-foreground">Active, completed, and dropped counts</p>
         </CardHeader>
         <CardContent className="pt-0">
           {data.seasons.length === 0 ? (
             <EmptyState icon={GraduationCap} title="No seasons yet" description="Create a season to see enrollment breakdowns." />
           ) : (
             <DataTable columns={seasonColumns} rows={data.seasons} rowKey={(r) => r.seasonId} />
-          )}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Alumni by graduation year</CardTitle>
-        </CardHeader>
-        <CardContent className="pt-0">
-          {data.alumniByYear.length === 0 ? (
-            <EmptyState
-              icon={GraduationCap}
-              title="No alumni yet"
-              description="Graduated students will be counted here by class year."
-            />
-          ) : (
-            <ul className="flex flex-wrap gap-2">
-              {data.alumniByYear.map((a) => (
-                <li key={a.year}>
-                  <Badge variant="success" className="text-sm">
-                    {a.year} · {a.count}
-                  </Badge>
-                </li>
-              ))}
-            </ul>
           )}
         </CardContent>
       </Card>

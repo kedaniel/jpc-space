@@ -12,11 +12,12 @@ export default async function SuperDashboard() {
   const user = await getCurrentUserOrRedirect();
   requireRole(user, ["SUPER"]);
 
-  const [userCount, activeSeasonCount, studentCount, alumniCount] = await Promise.all([
-    db.user.count({ where: { deletedAt: null } }),
-    db.season.count({ where: { status: "ACTIVE", deletedAt: null } }),
+  const now = new Date();
+  const [seasonCount, studentCount, alumniCount, eventCount] = await Promise.all([
+    db.season.count({ where: { deletedAt: null } }),
     db.user.count({ where: { role: "STUDENT", deletedAt: null, graduationYear: null } }),
     db.user.count({ where: { role: "STUDENT", deletedAt: null, graduationYear: { not: null } } }),
+    db.jpcEvent.count({ where: { date: { gte: now } } }),
   ]);
 
   return (
@@ -30,8 +31,8 @@ export default async function SuperDashboard() {
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <StatCard label="Students" value={studentCount} href="/super/students" />
         <StatCard label="Alumni" value={alumniCount} href="/super/students/alumni" variant="teal" />
-        <StatCard label="Active seasons" value={activeSeasonCount} href="/super/seasons" />
-        <StatCard label="Total users" value={userCount} href="/super/users" />
+        <StatCard label="Seasons" value={seasonCount} href="/super/seasons" />
+        <StatCard label="Upcoming events" value={eventCount} href="/super/events" />
       </div>
 
       {/* Upcoming JPC events */}

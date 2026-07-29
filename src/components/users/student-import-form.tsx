@@ -143,7 +143,20 @@ export function StudentImportForm({ seasons }: StudentImportFormProps) {
 
   const columns: DataTableColumn<ImportPreviewRow>[] = [
     { key: "row", header: "Row", cell: (r) => <span className="tabular-nums text-muted-foreground">{r.rowNumber}</span> },
-    { key: "name", header: "Name", cell: (r) => <span className="font-medium">{r.name || "—"}</span> },
+    {
+      key: "name",
+      header: "Name",
+      cell: (r) => (
+        <span className="flex flex-wrap items-center gap-1.5">
+          <span className="font-medium">{r.name || "—"}</span>
+          {r.profile.graduationYear && r.status !== "invalid" ? (
+            <Badge variant="success" className="text-[10px]">
+              Alumnus · {r.profile.graduationYear}
+            </Badge>
+          ) : null}
+        </span>
+      ),
+    },
     { key: "email", header: "Email", cell: (r) => <span className="text-muted-foreground">{r.email || "—"}</span> },
     {
       key: "status",
@@ -238,7 +251,8 @@ export function StudentImportForm({ seasons }: StudentImportFormProps) {
             <p className="mt-1 text-xs text-muted-foreground">
               CSV or Excel with a header row. <code>name</code> and <code>email</code> are required.
               Optional columns: Mobile No, University, Year, Date of birth, Spiritual background,
-              Gifts, Notes.
+              Gifts, Notes, <code>Graduation year</code>. A row with a graduation year is imported
+              as an alumnus (not enrolled in the season).
             </p>
           </FormField>
 

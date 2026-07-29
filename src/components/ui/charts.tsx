@@ -71,8 +71,9 @@ export function LineChartCard({
               />
               <Tooltip
                 contentStyle={{
-                  background: "white",
-                  border: `1px solid ${chartColors.neutral[200]}`,
+                  background: "var(--color-card)",
+                  color: "var(--color-foreground)",
+                  border: "1px solid var(--color-border)",
                   borderRadius: 6,
                   fontSize: 12,
                 }}
@@ -134,8 +135,9 @@ export function BarChartCard({
               />
               <Tooltip
                 contentStyle={{
-                  background: "white",
-                  border: `1px solid ${chartColors.neutral[200]}`,
+                  background: "var(--color-card)",
+                  color: "var(--color-foreground)",
+                  border: "1px solid var(--color-border)",
                   borderRadius: 6,
                   fontSize: 12,
                 }}
@@ -172,8 +174,9 @@ export function PieChartCard({
             <PieChart>
               <Tooltip
                 contentStyle={{
-                  background: "white",
-                  border: `1px solid ${chartColors.neutral[200]}`,
+                  background: "var(--color-card)",
+                  color: "var(--color-foreground)",
+                  border: "1px solid var(--color-border)",
                   borderRadius: 6,
                   fontSize: 12,
                 }}
