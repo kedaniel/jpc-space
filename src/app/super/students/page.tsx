@@ -35,6 +35,9 @@ export default async function SuperStudentsPage({
         description={`${rowsWithAvatars.length} student${rowsWithAvatars.length === 1 ? "" : "s"}`}
         actions={
           <div className="flex flex-wrap gap-2">
+            <Button variant="outline" render={<Link href="/super/students/alumni" />}>
+              Alumni
+            </Button>
             <Button variant="outline" render={<Link href="/super/students/dropped" />}>
               Dropped students
             </Button>

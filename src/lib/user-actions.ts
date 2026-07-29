@@ -9,12 +9,15 @@ import { db } from "@/lib/db";
 import { UserRole } from "@/generated/prisma/enums";
 import { getCurrentUserOrRedirect } from "@/lib/auth/session";
 import { isSuper } from "@/lib/rbac";
+import { roleRequiresAlumnus } from "@/lib/roles";
 import { ForbiddenError } from "@/lib/auth/errors";
 import { getStorage, buildStorageKey } from "@/lib/storage";
 
 export type ActionResult =
   | { ok: true; userId?: number }
   | { ok: false; error: string; fieldErrors?: Record<string, string> };
+
+const CURRENT_YEAR = new Date().getFullYear();
 
 const userSchema = z.object({
   name: z.string().min(2).max(120),
@@ -26,20 +29,43 @@ const userSchema = z.object({
     UserRole.STUDENT,
     UserRole.MENTOR,
   ]),
+  graduationYear: z.number().int().min(1990).max(CURRENT_YEAR).nullable(),
 });
+
+/**
+ * LEADER/SEASON_ADMIN/MENTOR may only be held by an alumnus. Returns a field-scoped
+ * error when the role requires a graduation year and none is provided.
+ */
+function checkAlumnusEligibility(
+  role: UserRole,
+  graduationYear: number | null,
+): { ok: false; error: string; fieldErrors: Record<string, string> } | null {
+  if (roleRequiresAlumnus(role) && graduationYear == null) {
+    return {
+      ok: false,
+      error: "This role is for alumni only — set a graduation year.",
+      fieldErrors: { graduationYear: "Required for this role." },
+    };
+  }
+  return null;
+}
 
 export interface CreateUserInput {
   name: string;
   email: string;
   role: UserRole;
+  graduationYear?: number | null;
 }
 
 export async function createUserAction(input: CreateUserInput): Promise<ActionResult> {
   const user = await getCurrentUserOrRedirect();
   if (!isSuper(user)) throw new ForbiddenError();
 
-  const parsed = userSchema.safeParse(input);
+  const parsed = userSchema.safeParse({ ...input, graduationYear: input.graduationYear ?? null });
   if (!parsed.success) return zodErrors(parsed.error);
+
+  const eligibility = checkAlumnusEligibility(parsed.data.role, parsed.data.graduationYear);
+  if (eligibility) return eligibility;
 
   const existing = await db.user.findUnique({ where: { email: parsed.data.email } });
   if (existing) {
@@ -57,6 +83,7 @@ export async function createUserAction(input: CreateUserInput): Promise<ActionRe
       name: parsed.data.name,
       email: parsed.data.email,
       role: parsed.data.role,
+      graduationYear: parsed.data.graduationYear,
       passwordHash,
       ...(parsed.data.role === UserRole.STUDENT
         ? { studentProfile: { create: {} } }
@@ -77,13 +104,26 @@ export async function updateUserAction(
   userId: number,
   name: string,
   role: UserRole,
+  graduationYear: number | null,
 ): Promise<ActionResult> {
   const user = await getCurrentUserOrRedirect();
   if (!isSuper(user)) throw new ForbiddenError();
 
+  const parsed = userSchema
+    .pick({ name: true, role: true, graduationYear: true })
+    .safeParse({ name, role, graduationYear });
+  if (!parsed.success) return zodErrors(parsed.error);
+
+  const eligibility = checkAlumnusEligibility(parsed.data.role, parsed.data.graduationYear);
+  if (eligibility) return eligibility;
+
   await db.user.update({
     where: { id: userId },
-    data: { name, role },
+    data: {
+      name: parsed.data.name,
+      role: parsed.data.role,
+      graduationYear: parsed.data.graduationYear,
+    },
   });
   revalidatePath("/super/users");
   return { ok: true };

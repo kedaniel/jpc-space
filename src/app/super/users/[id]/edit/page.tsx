@@ -24,6 +24,7 @@ export default async function EditUserPage({ params }: PageProps) {
       name: true,
       email: true,
       role: true,
+      graduationYear: true,
       deletedAt: true,
       passwordHash: true,
       lastLoginAt: true,
@@ -63,6 +64,7 @@ export default async function EditUserPage({ params }: PageProps) {
               name: target.name ?? "",
               email: target.email,
               role: target.role,
+              graduationYear: target.graduationYear,
             }}
           />
         </CardContent>

@@ -35,6 +35,9 @@ export default async function AdminStudentsPage({
           <p className="mt-1 text-sm text-muted-foreground">{`${rowsWithAvatars.length} student${rowsWithAvatars.length === 1 ? "" : "s"} in your seasons`}</p>
         </div>
         <div className="flex flex-wrap gap-2">
+          <Button variant="outline" render={<Link href="/admin/students/alumni" />}>
+            Alumni
+          </Button>
           <Button variant="outline" render={<Link href="/admin/students/dropped" />}>
             Dropped students
           </Button>
