@@ -19,6 +19,8 @@ import {
   Settings,
   Sparkles,
   User,
+  UserCheck,
+  UserMinus,
   Users,
   type LucideIcon,
 } from "lucide-react";
@@ -41,6 +43,8 @@ const iconMap: Record<NavIconName, LucideIcon> = {
   groups: Folders,
   season: Sparkles,
   students: GraduationCap,
+  alumni: UserCheck,
+  dropped: UserMinus,
   notes: Notebook,
   quizzes: PenLine,
   more: MoreHorizontal,

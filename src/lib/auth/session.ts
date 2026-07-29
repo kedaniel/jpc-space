@@ -11,6 +11,7 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
     seasonAdminIds: session.user.seasonAdminIds ?? [],
     groupLeaderIds: session.user.groupLeaderIds ?? [],
     activeSeasonId: session.user.activeSeasonId ?? null,
+    graduationYear: session.user.graduationYear ?? null,
   };
 }
 

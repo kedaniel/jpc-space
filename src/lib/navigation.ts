@@ -15,6 +15,8 @@ export type NavIconName =
   | "groups"
   | "season"
   | "students"
+  | "alumni"
+  | "dropped"
   | "notes"
   | "quizzes"
   | "more"
@@ -38,6 +40,8 @@ const SUPER: RoleNav = {
     { href: "/super/calendar", label: "Calendar", icon: "calendar" },
     { href: "/super/events", label: "JPC Events", icon: "events" },
     { href: "/super/students", label: "Students", icon: "students" },
+    { href: "/super/students/alumni", label: "Alumni", icon: "alumni" },
+    { href: "/super/students/dropped", label: "Dropped students", icon: "dropped" },
     { href: "/super/users", label: "Users", icon: "users" },
     { href: "/super/reports", label: "Reports", icon: "reports" },
     { href: "/super/settings", label: "Settings", icon: "settings" },
@@ -126,6 +130,24 @@ const MENTOR: RoleNav = {
   ],
 };
 
+// Alumni are graduated students (role STUDENT + graduationYear) — a read-only portal.
+const ALUMNI: RoleNav = {
+  sidebar: [
+    { href: "/alumni/dashboard", label: "Home", icon: "dashboard" },
+    { href: "/alumni/calendar", label: "Events", icon: "events" },
+    { href: "/alumni/history", label: "My History", icon: "history" },
+    { href: "/alumni/profile", label: "Profile", icon: "profile" },
+    { href: "/alumni/settings", label: "Settings", icon: "settings" },
+  ],
+  tabs: [
+    { href: "/alumni/calendar", label: "Events", icon: "events" },
+    { href: "/alumni/history", label: "History", icon: "history" },
+    { href: "/alumni/dashboard", label: "Home", icon: "home" },
+    { href: "/alumni/profile", label: "Profile", icon: "profile" },
+    { href: "/alumni/more", label: "More", icon: "more" },
+  ],
+};
+
 export const navByRole: Record<UserRole, RoleNav> = {
   SUPER,
   ADMIN,
@@ -135,5 +157,6 @@ export const navByRole: Record<UserRole, RoleNav> = {
 };
 
 export function navFor(user: SessionUser): RoleNav {
+  if (user.role === "STUDENT" && user.graduationYear != null) return ALUMNI;
   return navByRole[user.role];
 }
