@@ -27,7 +27,7 @@ export default async function StudentCalendarPage() {
   }
 
   const [sessions, jpcEvents] = await Promise.all([
-    listSessionsForSeason(user.activeSeasonId),
+    listSessionsForSeason(user.activeSeasonId, { includeCheckInToken: false }),
     listJpcEvents({ includeAlumniOnly: false, seasonIds: await viewerSeasonIds(user) }),
   ]);
 

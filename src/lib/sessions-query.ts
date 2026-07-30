@@ -18,7 +18,15 @@ export interface SessionListRow {
   checkInClosedAt: Date | null;
 }
 
-export async function listSessionsForSeason(seasonId: number): Promise<SessionListRow[]> {
+/**
+ * Possession of `checkInToken` is what authorises a check-in, so it must never
+ * reach students — a student holding it could mark themselves present without
+ * attending, or pass it to someone who is absent.
+ */
+export async function listSessionsForSeason(
+  seasonId: number,
+  { includeCheckInToken = true }: { includeCheckInToken?: boolean } = {},
+): Promise<SessionListRow[]> {
   const rows = await db.session.findMany({
     where: { seasonId },
     orderBy: { startsAt: "asc" },
@@ -29,7 +37,7 @@ export async function listSessionsForSeason(seasonId: number): Promise<SessionLi
       durationMinutes: true,
       location: true,
       recurrenceGroupId: true,
-      checkInToken: true,
+      checkInToken: includeCheckInToken,
       checkInOpenAt: true,
       checkInClosedAt: true,
       _count: { select: { attendance: true } },
@@ -47,7 +55,7 @@ export async function listSessionsForSeason(seasonId: number): Promise<SessionLi
     seasonId: s.season.id,
     seasonCode: s.season.code,
     seasonTitle: s.season.title,
-    checkInToken: s.checkInToken,
+    checkInToken: includeCheckInToken ? (s.checkInToken ?? null) : null,
     checkInOpenAt: s.checkInOpenAt,
     checkInClosedAt: s.checkInClosedAt,
   }));
@@ -105,7 +113,11 @@ export interface SessionDetailData {
   checkInClosedAt: Date | null;
 }
 
-export async function loadSessionById(id: number): Promise<SessionDetailData> {
+/** See `listSessionsForSeason` — `checkInToken` must not reach students. */
+export async function loadSessionById(
+  id: number,
+  { includeCheckInToken = true }: { includeCheckInToken?: boolean } = {},
+): Promise<SessionDetailData> {
   const s = await db.session.findUnique({
     where: { id },
     select: {
@@ -119,7 +131,7 @@ export async function loadSessionById(id: number): Promise<SessionDetailData> {
       recurrenceGroupId: true,
       seasonId: true,
       season: { select: { code: true, title: true } },
-      checkInToken: true,
+      checkInToken: includeCheckInToken,
       checkInOpenAt: true,
       checkInClosedAt: true,
     },
@@ -137,7 +149,7 @@ export async function loadSessionById(id: number): Promise<SessionDetailData> {
     seasonId: s.seasonId,
     seasonCode: s.season.code,
     seasonTitle: s.season.title,
-    checkInToken: s.checkInToken,
+    checkInToken: includeCheckInToken ? (s.checkInToken ?? null) : null,
     checkInOpenAt: s.checkInOpenAt,
     checkInClosedAt: s.checkInClosedAt,
   };

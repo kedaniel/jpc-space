@@ -20,7 +20,9 @@ export const GET = withApiAuth<RouteContext<"/api/v1/seasons/[id]/sessions">>(
       return apiError("forbidden", "You don't have access to this.", 403);
     }
 
-    const sessions = await listSessionsForSeason(seasonId);
+    const sessions = await listSessionsForSeason(seasonId, {
+      includeCheckInToken: user.role !== "STUDENT",
+    });
     return apiOk({ sessions });
   },
 );

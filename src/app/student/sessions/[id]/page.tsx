@@ -24,7 +24,7 @@ export default async function StudentSessionPage({ params }: PageProps) {
   requireRole(user, ["STUDENT"]);
 
   const { id } = await params;
-  const session = await loadSessionById(Number(id));
+  const session = await loadSessionById(Number(id), { includeCheckInToken: false });
 
   const enrollment = await db.seasonEnrollment.findFirst({
     where: { seasonId: session.seasonId, studentUserId: user.userId, status: "ACTIVE" },
