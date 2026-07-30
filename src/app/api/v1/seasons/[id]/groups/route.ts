@@ -20,7 +20,9 @@ export const GET = withApiAuth<RouteContext<"/api/v1/seasons/[id]/groups">>(
       return apiError("forbidden", "You don't have access to this.", 403);
     }
 
-    const groups = await listGroupsForSeason(seasonId);
+    const groups = await listGroupsForSeason(seasonId, {
+      onlyStudentUserId: user.role === "STUDENT" ? user.userId : undefined,
+    });
     return apiOk({ groups });
   },
 );

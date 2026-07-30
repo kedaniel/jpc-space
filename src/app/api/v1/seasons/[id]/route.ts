@@ -31,6 +31,8 @@ export const GET = withApiAuth<RouteContext<"/api/v1/seasons/[id]">>(async (_req
       endDate: true,
       _count: { select: { sessions: true, enrollments: true } },
       groups: {
+        // Students may only see their own group.
+        where: user.role === "STUDENT" ? { students: { some: { studentUserId: user.userId } } } : {},
         orderBy: { name: "asc" },
         select: {
           id: true,

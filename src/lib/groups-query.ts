@@ -12,9 +12,22 @@ export interface GroupListRow {
   seasonTitle: string;
 }
 
-export async function listGroupsForSeason(seasonId: number): Promise<GroupListRow[]> {
+/**
+ * `onlyStudentUserId` narrows the list to that student's own group. Students may
+ * only see their own group and its leaders, so the scope is applied in the query
+ * rather than filtered out of the response.
+ */
+export async function listGroupsForSeason(
+  seasonId: number,
+  { onlyStudentUserId }: { onlyStudentUserId?: number } = {},
+): Promise<GroupListRow[]> {
   const rows = await db.group.findMany({
-    where: { seasonId },
+    where: {
+      seasonId,
+      ...(onlyStudentUserId
+        ? { students: { some: { studentUserId: onlyStudentUserId } } }
+        : {}),
+    },
     orderBy: { name: "asc" },
     select: {
       id: true,
